@@ -9,3 +9,11 @@ macro_rules! compute_fn {
 		res
 	};
 }
+
+
+macro_rules! admin_only {
+	($ato_data:expr, $signer:expr) => {
+		let ato_data = $ato_data;
+		require_eq!(ato_data.admin, $signer.key(), AtoError::AdminOnly);
+	};
+}

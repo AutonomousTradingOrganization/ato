@@ -10,7 +10,9 @@ pub struct AtoData {
 	pub admin    : Pubkey,
 	pub scheduler: Pubkey,
 	pub status   : u8,
+	pub paused   : bool,
 }
+
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
@@ -27,8 +29,24 @@ pub struct Initialize<'info> {
 	pub system_program: Program<'info, System>,
 }
 
+
 #[derive(Accounts)]
 pub struct SetScheduler<'info> {
+
+	#[account(
+		mut,
+	)]
+	pub ato_data: Account<'info, AtoData>,
+
+	#[account(mut)]
+	pub signer: Signer<'info>,
+
+	pub system_program: Program<'info, System>,
+}
+
+
+#[derive(Accounts)]
+pub struct SetPause<'info> {
 
 	#[account(
 		mut,
