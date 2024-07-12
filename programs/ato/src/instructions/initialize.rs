@@ -6,7 +6,7 @@ use crate::errors;      pub use errors::AtoError;
 
 
 pub fn call(ctx: Context<Initialize>) -> Result<()> {
-	let  ato_data: &mut Account<AtoData> = &mut ctx.accounts.ato_data;
+	let ato_data: &mut Account<AtoData> = &mut ctx.accounts.ato_data;
 
 	ato_data.admin     = ctx.accounts.signer.key();
 	ato_data.scheduler = Pubkey::default();

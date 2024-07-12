@@ -6,9 +6,10 @@ use crate::errors;      pub use errors::AtoError;
 
 
 pub fn call(ctx: Context<SetPause>, to: bool) -> Result<()> {
-	admin_only!(&mut ctx.accounts.ato_data, ctx.accounts.signer);
+	admin_only!(ctx);
+	//admin_only!(&mut ctx.accounts.ato_data, ctx.accounts.signer);
 
-	let  ato_data: &mut Account<AtoData> = &mut ctx.accounts.ato_data;
+	let ato_data: &mut Account<AtoData> = &mut ctx.accounts.ato_data;
 
 	ato_data.paused = to;
 

@@ -19,8 +19,7 @@ Beware it creates local files and directories at the current working directory.
 
 `anchor test --skip-local-validator`
 
-Just check if read/write instructions works.
-Display all account(s) bind to program (`await program.account.myStorage.all()`)
+**TO DO**
 
 ## Versions
 

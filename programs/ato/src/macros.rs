@@ -12,8 +12,9 @@ macro_rules! compute_fn {
 
 
 macro_rules! admin_only {
-	($ato_data:expr, $signer:expr) => {
-		let ato_data = $ato_data;
-		require_eq!(ato_data.admin, $signer.key(), AtoError::AdminOnly);
+	($ctx:expr) => {
+		let ato_data = &mut $ctx.accounts.ato_data;
+		let signer = &$ctx.accounts.signer;
+		require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
 	};
 }
