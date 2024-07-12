@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Ato } from "../target/types/ato";
 import { expect } from "chai";
+import { publicKey } from "@coral-xyz/anchor/dist/cjs/utils";
 
 // this airdrops sol to an address
 async function airdropSol(publicKey, amount) {
@@ -29,10 +30,17 @@ describe("ato", () => {
   const program        = anchor.workspace.Ato as Program<Ato>;
   const atoDataKeypair = anchor.web3.Keypair.generate();
 
-  const imposterWallet = anchor.web3.Keypair.generate();
+  const walletIimposter = anchor.web3.Keypair.generate();
+  const walletScheduler = anchor.web3.Keypair.generate();
+
+  const ATO_STATUS_NOT_READY  = 0;
+  const ATO_STATUS_READY      = 1;
+  const PUBLICKEY_DEFAULT_STR = "11111111111111111111111111111111";
+
 
   it("initialized(): Is initialized!", async () => {
-    await airdropSol(imposterWallet.publicKey, 1e9); // 1 SOL
+    //await airdropSol(walletIimposter.publicKey, 1e9); // 1 SOL
+    //await airdropSol(walletScheduler.publicKey, 1e9); // 1 SOL
 
     const tx = await program.methods
       .initialize()
@@ -44,7 +52,29 @@ describe("ato", () => {
       .signers([atoDataKeypair])
       .rpc();
 
+
+    const pausedValueToFalse = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).paused.valueOf();
+    
+    expect(pausedValueToFalse).to.equal(false);
+
+
+    const getScheduler = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).scheduler.valueOf();
+
+    expect(getScheduler.toString()).to.equal(PUBLICKEY_DEFAULT_STR);
+
+
+    const getStatus = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+
+    expect(getStatus).to.equal(ATO_STATUS_NOT_READY);
+  
   });
+
 
   it("initialized(): Can't be initialize again", async () => {
     try {
@@ -66,7 +96,8 @@ describe("ato", () => {
 
   });
 
-  it("Pausable: Check internal status", async () => {
+
+  it("set_pause(): Check internal status", async () => {
     const pausedValueToFalse = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
     ).paused.valueOf();
@@ -105,16 +136,17 @@ describe("ato", () => {
 
   });
 
-  it("Pausable: Check admin only", async () => {
+
+  it("set_pause(): Check admin only", async () => {
     try {
       const txPauseToFalsee = await program.methods
       .setPause(false)
       .accounts({
         atoData      : atoDataKeypair.publicKey,
-        signer       : imposterWallet.publicKey,
+        signer       : walletIimposter.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
-      .signers([imposterWallet])
+      .signers([walletIimposter])
       .rpc();
 
       expect.fail("The transaction setPause() should have failed but it didn't.");
@@ -127,6 +159,70 @@ describe("ato", () => {
     }
 
   });
-  
+
+
+  it("set_scheduler(): Check internal status", async () => {
+    const getSchedulerBefore = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).scheduler.valueOf();
+
+    expect(getSchedulerBefore.toString()).to.equal(PUBLICKEY_DEFAULT_STR);
+
+
+    const getStatusBefore = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+
+    expect(getStatusBefore).to.equal(ATO_STATUS_NOT_READY);
+
+
+    const txPauseToFalsee = await program.methods
+    .setScheduler(walletScheduler.publicKey)
+    .accounts({
+      atoData      : atoDataKeypair.publicKey,
+      signer       : provider.wallet.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    })
+    //.signers([provider.wallet.publicKey])
+    .rpc();
+
+
+    const getSchedulerAfter = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).scheduler.valueOf();
+
+    expect(getSchedulerAfter.toString()).to.equal(walletScheduler.publicKey.toString());
+
+
+    const getStatusAfter = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+
+    expect(getStatusAfter).to.equal(ATO_STATUS_READY);
+
+  });
+
+
+  it("set_scheduler(): Check admin only", async () => {
+    try {
+      const txPauseToFalsee = await program.methods
+      .setScheduler(walletScheduler.publicKey)
+      .accounts({
+        atoData      : atoDataKeypair.publicKey,
+        signer       : walletIimposter.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([walletIimposter])
+      .rpc();
+
+      expect.fail("The transaction set_scheduler() should have failed but it didn't.");
+
+    } catch(err) {
+      expect(err.message).to.include("Error Code: AdminOnly");
+      // console.log("====");
+      // console.log(err.message);
+      // console.log("====");
+    }
+  });
 
 });
