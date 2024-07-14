@@ -30,5 +30,23 @@ pub mod ato {
 		set_pause::call(ctx, to)
 	}
 
+	pub fn proposal_create(
+		ctx        : Context<ProposalCreate>,
+		title      : String,
+		description: String,
+		mode       : u8,
+		threshold  : u64,
+		deadline   : u64,
+	 ) -> Result<()> {
+		proposal_create::call(
+			ctx,
+			title,
+			description,
+			mode,
+			threshold,
+			deadline
+		)
+	}
+
 }
 

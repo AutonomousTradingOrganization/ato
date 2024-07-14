@@ -18,3 +18,11 @@ macro_rules! admin_only {
 		require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
 	};
 }
+
+// not yet tested !
+macro_rules! pausable {
+	($ctx:expr) => {
+		let ato_data = &mut $ctx.accounts.ato_data;
+		require_eq!(ato_data.paused, false, AtoError::ProgramPaused);
+	};
+}

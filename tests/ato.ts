@@ -4,6 +4,7 @@ import { Ato } from "../target/types/ato";
 import { expect } from "chai";
 import { publicKey } from "@coral-xyz/anchor/dist/cjs/utils";
 
+
 // this airdrops sol to an address
 async function airdropSol(publicKey, amount) {
   let airdropTx = await anchor.getProvider().connection.requestAirdrop(publicKey, amount * anchor.web3.LAMPORTS_PER_SOL);
@@ -18,8 +19,10 @@ async function confirmTransaction(tx) {
     signature: tx,
   });
 }
+
 //-const newKeypair = anchor.web3.Keypair.generate();
-//-await airdropSol(newKeypair.publicKey, 1e9); // 1 SOL
+//-await airdropSol(newKeypair.publicKey, 1); // 1 SOL
+
 
 describe("ato", () => {
   // Configure the client to use the local cluster.
@@ -39,8 +42,8 @@ describe("ato", () => {
 
 
   it("initialized(): Is initialized!", async () => {
-    //await airdropSol(walletIimposter.publicKey, 1e9); // 1 SOL
-    //await airdropSol(walletScheduler.publicKey, 1e9); // 1 SOL
+    //await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
+    //await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
 
     const tx = await program.methods
       .initialize()
@@ -72,6 +75,19 @@ describe("ato", () => {
     ).status.valueOf();
 
     expect(getStatus).to.equal(ATO_STATUS_NOT_READY);
+
+
+    const getIndexHead = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+
+    expect(getIndexHead).to.equal(0);
+
+    const getIndexTail = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+  
+    expect(getIndexTail).to.equal(0);
   
   });
 
@@ -153,9 +169,6 @@ describe("ato", () => {
 
     } catch(err) {
       expect(err.message).to.include("Error Code: AdminOnly");
-      // console.log("====");
-      // console.log(err.message);
-      // console.log("====");
     }
 
   });
@@ -219,10 +232,8 @@ describe("ato", () => {
 
     } catch(err) {
       expect(err.message).to.include("Error Code: AdminOnly");
-      // console.log("====");
-      // console.log(err.message);
-      // console.log("====");
     }
+
   });
 
 });
