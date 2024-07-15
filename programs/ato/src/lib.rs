@@ -36,7 +36,7 @@ pub mod ato {
 		description: String,
 		mode       : u8,
 		threshold  : u64,
-		deadline   : u8,
+		deadline   : u64,
 	 ) -> Result<()> {
 		proposal_create::call(
 			ctx,

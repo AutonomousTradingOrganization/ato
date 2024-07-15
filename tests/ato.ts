@@ -42,7 +42,7 @@ describe("ato", () => {
 
 
   it("initialized(): Is initialized!", async () => {
-    //await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
+    await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
     //await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
 
     const tx = await program.methods
@@ -236,31 +236,164 @@ describe("ato", () => {
 
   });
 
-  it("proposal_create(): Check admin only", async () => {
-    try {
-      const title       = "Test proposal";
-      const description = "This is a test proposal";
-      const mode        = 0;
-      const threshold   = 1;
-      const deadline    = 60;
 
-      const tx = await program.methods
+  it("proposal_create(): attempt to create a proposal", async () => {
+    const title       = "Test proposal #1";
+    const description = "This is a test proposal";
+    const mode        = 0;
+    const threshold   = 1;
+    const deadline    = 60;
+
+    const tailIndex = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexTail.valueOf();
+    console.log(tailIndex);
+    const propsIndexBuffer = Buffer.allocUnsafe(2);
+    propsIndexBuffer.writeUInt16LE(tailIndex, 0);
+    console.log(propsIndexBuffer);
+
+    // Calculer l'adresse de la PDA
+    const [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from("ATO_PROP"),
+        provider.wallet.publicKey.toBuffer(),
+        propsIndexBuffer,
+      ],
+      program.programId
+    );
+
+    let props = {
+      pubkey: propsPubkey,
+      bump  : propsBump,
+    };
+
+    let txProp1 = await program.methods
       .proposalCreate(
         title,
         description,
         mode,
         new anchor.BN(threshold),
-        deadline
+        new anchor.BN(deadline)
       )
       .accounts({
+        propsData    : props.pubkey,
         atoData      : atoDataKeypair.publicKey,
-        signer       : walletIimposter.publicKey,
+        signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
-      .signers([walletIimposter])
+      //.signers([provider.wallet])
       .rpc();
 
-      expect.fail("The transaction proposal_create() should have failed but it didn't.");
+      console.log("");
+      console.log("https://solana.fm/tx/"+txProp1);
+      console.log("");
+
+  });
+
+
+  it("proposal_create(): attempt to create second proposal", async () => {
+    const title       = "Test proposal #2";
+    const description = "This is a test proposal";
+    const mode        = 0;
+    const threshold   = 1;
+    const deadline    = 120;
+
+    const tailIndex = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexTail.valueOf();
+    console.log(tailIndex);
+    const propsIndexBuffer = Buffer.allocUnsafe(2);
+    propsIndexBuffer.writeUInt16LE(tailIndex, 0);
+    console.log(propsIndexBuffer);
+
+    // Calculer l'adresse de la PDA
+    const [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from("ATO_PROP"),
+        provider.wallet.publicKey.toBuffer(),
+        propsIndexBuffer,
+      ],
+      program.programId
+    );
+
+    let props = {
+      pubkey: propsPubkey,
+      bump  : propsBump,
+    };
+
+    let txProp1 = await program.methods
+      .proposalCreate(
+        title,
+        description,
+        mode,
+        new anchor.BN(threshold),
+        new anchor.BN(deadline)
+      )
+      .accounts({
+        propsData    : props.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+
+      console.log("");
+      console.log("https://solana.fm/tx/"+txProp1);
+      console.log("");
+
+  });
+
+
+  it("proposal_create(): Check admin only", async () => {
+    try {
+      const title       = "Test proposal #2";
+      const description = "This is a test proposal";
+      const mode        = 0;
+      const threshold   = 1;
+      const deadline    = 120;
+
+      const tailIndex = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).proposalIndexTail.valueOf();
+      //console.log(tailIndex);
+      const propsIndexBuffer = Buffer.allocUnsafe(2);
+      propsIndexBuffer.writeUInt16LE(tailIndex, 0);
+      //console.log(propsIndexBuffer);
+
+      // Calculer l'adresse de la PDA
+      const [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("ATO_PROP"),
+          walletIimposter.publicKey.toBuffer(),
+          propsIndexBuffer,
+        ],
+        program.programId
+      );
+
+      let props = {
+        pubkey: propsPubkey,
+        bump  : propsBump,
+      };
+
+      let txProp1 = await program.methods
+        .proposalCreate(
+          title,
+          description,
+          mode,
+          new anchor.BN(threshold),
+          new anchor.BN(deadline)
+        )
+        .accounts({
+          propsData    : props.pubkey,
+          atoData      : atoDataKeypair.publicKey,
+          signer       : walletIimposter.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([walletIimposter])
+        .rpc();
+
+      expect.fail("The transaction set_scheduler() should have failed but it didn't.");
 
     } catch(err) {
       expect(err.message).to.include("Error Code: AdminOnly");

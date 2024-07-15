@@ -1,6 +1,6 @@
 pub const PROPOSAL_MAX: u16 = 65000;
-pub const DEADLINE_MIN: u8 = 1;
-pub const DEADLINE_MAX: u8 = 100;
+pub const DEADLINE_MIN: u64 = 1;	// 1 second
+pub const DEADLINE_MAX: u64 = 60 * 60 * 24 * 30;	// 30 days
 
 pub const ATO_LABEL_PROPOSAL: &[u8; 8] = b"ATO_PROP";
 pub const ATO_LABEL_VOTER: &[u8; 9]    = b"ATO_VOTER";
