@@ -13,6 +13,12 @@ pub fn call(
 	threshold  : u64,
 	deadline   : u64,
 ) -> Result<()> {
+// 	msg!("{}", line!());
+// 	msg!("{}", title);
+// {
+// 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
+// 	msg!("{:?}", props_data.key());
+// }
 	admin_only!(ctx);
 	//-pausable!(ctx);
 
@@ -32,6 +38,8 @@ pub fn call(
 	props_data.deadline  = deadline;
 	props_data.mode      = mode;
 	props_data.threshold = threshold;
+	props_data.vote_yes  = 0;	// no YES
+	props_data.vote_no   = 0;	// no NO
 	string_to_u8!(title, props_data.title);
 	string_to_u8!(description, props_data.description);
 	props_data.status    = AtoProposalStatus::Waiting as u8;

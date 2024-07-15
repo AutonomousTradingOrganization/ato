@@ -72,6 +72,8 @@ pub struct AtoProposal {
 	pub signer     : Pubkey,
 	pub deadline   : u64,
 	pub threshold  : u64,
+	pub vote_yes   : u16,
+	pub vote_no    : u16,
 	pub title      : [u8; STR_SIZE_TITLE],
 	pub description: [u8; STR_SIZE_DESCR],
 	pub mode       : u8,
@@ -99,7 +101,10 @@ pub struct ProposalCreate<'info> {
 	)]
 	pub ato_data: Account<'info, AtoData>,
 	
-	#[account(mut)]
+	#[account(
+		mut,
+		constraint = signer.key() == ato_data.admin
+	)]
 	pub signer: Signer<'info>,
 
 	pub system_program: Program<'info, System>,

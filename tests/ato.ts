@@ -40,6 +40,9 @@ describe("ato", () => {
   const ATO_STATUS_READY      = 1;
   const PUBLICKEY_DEFAULT_STR = "11111111111111111111111111111111";
 
+  const ATO_PROPS_MODE_OVER  = 0;
+  const ATO_PROPS_MODE_LOWER = 1;
+  const ATO_PROPS_MODE_DELAY = 2;
 
   it("initialized(): Is initialized!", async () => {
     await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
@@ -240,7 +243,7 @@ describe("ato", () => {
   it("proposal_create(): attempt to create a proposal", async () => {
     const title       = "Test proposal #1";
     const description = "This is a test proposal";
-    const mode        = 0;
+    const mode        = ATO_PROPS_MODE_OVER;
     const threshold   = 1;
     const deadline    = 60;
 
@@ -294,7 +297,7 @@ describe("ato", () => {
   it("proposal_create(): attempt to create second proposal", async () => {
     const title       = "Test proposal #2";
     const description = "This is a test proposal";
-    const mode        = 0;
+    const mode        = ATO_PROPS_MODE_OVER;
     const threshold   = 1;
     const deadline    = 120;
 
@@ -346,10 +349,11 @@ describe("ato", () => {
 
 
   it("proposal_create(): Check admin only", async () => {
+
     try {
-      const title       = "Test proposal #2";
+      const title       = "Test proposal imposter";
       const description = "This is a test proposal";
-      const mode        = 0;
+      const mode        = ATO_PROPS_MODE_OVER;
       const threshold   = 1;
       const deadline    = 120;
 
@@ -396,7 +400,17 @@ describe("ato", () => {
       expect.fail("The transaction set_scheduler() should have failed but it didn't.");
 
     } catch(err) {
-      expect(err.message).to.include("Error Code: AdminOnly");
+      // console.log("---");
+      // console.log(err.message);
+      // console.log("---");
+      //expect(err.message).to.include("Error Code: AdminOnly");
+      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
+      
+
+      // console.log("");
+      // console.log("https://solana.fm/tx/"+txProp1);
+      // console.log("");
+
     }
 
   });

@@ -35,6 +35,7 @@ pub enum AtoProposalStatus {
 	Closed,		// Sorry, vote is over
 	Paused,		// Damned !
 	Canceled,	// Proposal is canceled, leave it !
+	Error,		// PDA created but not initialized
 	MAX,
 }
 
@@ -46,6 +47,7 @@ impl From<u8> for AtoProposalStatus {
 			2 => AtoProposalStatus::Closed,
 			3 => AtoProposalStatus::Paused,
 			4 => AtoProposalStatus::Canceled,
+			5 => AtoProposalStatus::Error,
 			_ => panic!("Invalid AtoProposalStatus value"),
 		}
 	}
@@ -54,10 +56,8 @@ impl From<u8> for AtoProposalStatus {
 
 pub enum AtoProposalMode {
 	Over,
-	Below,
-	Minutes,
-	Hours,
-	Days,
+	Lower,
+	Delay,
 	MAX
 }
 
@@ -65,10 +65,8 @@ impl From<u8> for AtoProposalMode {
 	fn from(value: u8) -> Self {
 		match value {
 			0 => AtoProposalMode::Over,
-			1 => AtoProposalMode::Below,
-			2 => AtoProposalMode::Minutes,
-			3 => AtoProposalMode::Hours,
-			4 => AtoProposalMode::Days,
+			1 => AtoProposalMode::Lower,
+			2 => AtoProposalMode::Delay,
 			_ => panic!("Invalid AtoProposalMode value"),
 		}
 	}
