@@ -1,8 +1,15 @@
 pub const PROPOSAL_MAX: u16 = 65000;
+pub const DEADLINE_MIN: u8 = 1;
+pub const DEADLINE_MAX: u8 = 100;
 
 pub const ATO_LABEL_PROPOSAL: &[u8; 8] = b"ATO_PROP";
-pub const ATO_VOTER: &[u8; 9]          = b"ATO_VOTER";
-pub const ATO_VOTE: &[u8; 8]           = b"ATO_VOTE";
+pub const ATO_LABEL_VOTER: &[u8; 9]    = b"ATO_VOTER";
+pub const ATO_LABEL_VOTE: &[u8; 8]     = b"ATO_VOTE";
+
+
+pub const STR_SIZE_TITLE: usize = 32;
+pub const STR_SIZE_DESCR: usize = 100;
+
 
 pub enum AtoStatus {
 	NotReady,	// Not totaly initialized (scheduler key ?)
@@ -23,7 +30,7 @@ impl From<u8> for AtoStatus {
 
 
 pub enum AtoProposalStatus {
-	Draft,		// Presentation, you can't vote for it yet...
+	Waiting,	// Presentation, you can't vote for it yet...
 	Launched,	// Ready, you can vote for it
 	Closed,		// Sorry, vote is over
 	Paused,		// Damned !
@@ -34,7 +41,7 @@ pub enum AtoProposalStatus {
 impl From<u8> for AtoProposalStatus {
 	fn from(value: u8) -> Self {
 		match value {
-			0 => AtoProposalStatus::Draft,
+			0 => AtoProposalStatus::Waiting,
 			1 => AtoProposalStatus::Launched,
 			2 => AtoProposalStatus::Closed,
 			3 => AtoProposalStatus::Paused,

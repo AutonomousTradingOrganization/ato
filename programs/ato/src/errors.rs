@@ -18,4 +18,16 @@ pub enum AtoError {
 	#[msg("Incorrect proposal mode.")]
 	IncorrectProposalMode,
 
+	#[msg("Incorrect title lenght.")]
+	IncorrectTitleLenght,
+
+	#[msg("Incorrect description lenght.")]
+	IncorrectDescriptionLenght,
+
+	#[msg("Too big deadline.")]
+	TooBigDeadline,
+
+	#[msg("Too small deadline.")]
+	TooSmallDeadline,
+
 }

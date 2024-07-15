@@ -218,7 +218,7 @@ describe("ato", () => {
 
   it("set_scheduler(): Check admin only", async () => {
     try {
-      const txPauseToFalsee = await program.methods
+      const txPauseToFalse = await program.methods
       .setScheduler(walletScheduler.publicKey)
       .accounts({
         atoData      : atoDataKeypair.publicKey,
@@ -229,6 +229,38 @@ describe("ato", () => {
       .rpc();
 
       expect.fail("The transaction set_scheduler() should have failed but it didn't.");
+
+    } catch(err) {
+      expect(err.message).to.include("Error Code: AdminOnly");
+    }
+
+  });
+
+  it("proposal_create(): Check admin only", async () => {
+    try {
+      const title       = "Test proposal";
+      const description = "This is a test proposal";
+      const mode        = 0;
+      const threshold   = 1;
+      const deadline    = 60;
+
+      const tx = await program.methods
+      .proposalCreate(
+        title,
+        description,
+        mode,
+        new anchor.BN(threshold),
+        deadline
+      )
+      .accounts({
+        atoData      : atoDataKeypair.publicKey,
+        signer       : walletIimposter.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([walletIimposter])
+      .rpc();
+
+      expect.fail("The transaction proposal_create() should have failed but it didn't.");
 
     } catch(err) {
       expect(err.message).to.include("Error Code: AdminOnly");

@@ -26,3 +26,13 @@ macro_rules! pausable {
 		require_eq!(ato_data.paused, false, AtoError::ProgramPaused);
 	};
 }
+
+
+macro_rules! string_to_u8 {
+	($string:expr, $storage_title:expr) => {{
+		let bytes: &[u8] = $string.as_bytes();
+		let len = bytes.len().min($storage_title.len());
+		$storage_title[..len].copy_from_slice(&bytes[..len]);
+		//$storage_title
+	}};
+}
