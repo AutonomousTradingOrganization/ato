@@ -11,21 +11,21 @@ macro_rules! compute_fn {
 }
 
 
-macro_rules! admin_only {
-	($ctx:expr) => {
-		let ato_data = &mut $ctx.accounts.ato_data;
-		let signer = &$ctx.accounts.signer;
-		require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
-	};
-}
+// macro_rules! admin_only {
+// 	($ctx:expr) => {
+// 		let ato_data = &mut $ctx.accounts.ato_data;
+// 		let signer = &$ctx.accounts.signer;
+// 		require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
+// 	};
+// }
 
 // not yet tested !
-macro_rules! pausable {
-	($ctx:expr) => {
-		let ato_data = &mut $ctx.accounts.ato_data;
-		if ato_data.paused { return Ok(())}
-	};
-}
+// macro_rules! pausable {
+// 	($ctx:expr) => {
+// 		let ato_data = &mut $ctx.accounts.ato_data;
+// 		if ato_data.paused { return Ok(())}
+// 	};
+// }
 
 macro_rules! string_to_u8 {
 	($string:expr, $storage_title:expr) => {{

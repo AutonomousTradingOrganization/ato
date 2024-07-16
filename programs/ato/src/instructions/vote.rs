@@ -9,7 +9,7 @@ pub fn call(
 	ctx : Context<Vote>,
 	vote: bool,
 ) -> Result<()> {
-	pausable!(ctx);
+	//-pausable!(ctx);
 	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
 	let vote_data: &mut Account<AtoVote>      = &mut ctx.accounts.vote_data;

@@ -20,13 +20,17 @@ async function confirmTransaction(tx) {
   });
 }
 
-async function getAccounts(amount) {
-  let accounts: any[];
+async function createAccounts(nn: number, amount: number) {
+  let accounts: any[] = [];
   let i = 0;
-  for( i=0; i<10; i++) {
-    const account = anchor.web3.Keypair.generate();
-    await airdropSol(account, amount);
-    accounts = accounts.concat(account);
+
+  for( i=0; i<nn; i++) {
+    let account = anchor.web3.Keypair.generate();
+    await airdropSol(account.publicKey, amount);
+    // console.log(account.publicKey.toString());
+    // const balance = await anchor.getProvider().connection.getBalance(account.publicKey);
+    // console.log("Balance:", balance / anchor.web3.LAMPORTS_PER_SOL, "SOL");
+    accounts.push(account);
   }
   return accounts;
 }
@@ -179,7 +183,7 @@ describe("ato", () => {
       expect.fail("The transaction setPause() should have failed but it didn't.");
 
     } catch(err) {
-      expect(err.message).to.include("Error Code: AdminOnly");
+      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
     }
 
   });
@@ -242,7 +246,7 @@ describe("ato", () => {
       expect.fail("The transaction set_scheduler() should have failed but it didn't.");
 
     } catch(err) {
-      expect(err.message).to.include("Error Code: AdminOnly");
+      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
     }
 
   });
@@ -405,13 +409,12 @@ describe("ato", () => {
         .signers([walletIimposter])
         .rpc();
 
-      expect.fail("The transaction set_scheduler() should have failed but it didn't.");
+      expect.fail("The transaction proposal_create() should have failed but it didn't.");
 
     } catch(err) {
       // console.log("---");
       // console.log(err.message);
       // console.log("---");
-      //expect(err.message).to.include("Error Code: AdminOnly");
       expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
       
 
@@ -421,6 +424,21 @@ describe("ato", () => {
 
     }
 
+  });
+
+
+  it("vote(): attempt to vote", async () => {
+    const accounts = await createAccounts(1, 2);
+    const walletAlain   = accounts[0];
+    //const walletBernard = accounts[1];
+    //const walletCeline  = accounts[2];
+    // console.log(walletAlain.publicKey.toString());
+    // console.log(walletBernard.publicKey.toString());
+    // console.log(walletCeline.publicKey.toString());
+
+
+
+    //
   });
 
 });

@@ -43,7 +43,10 @@ pub struct SetScheduler<'info> {
 	)]
 	pub ato_data: Account<'info, AtoData>,
 
-	#[account(mut)]
+	#[account(
+		mut,
+		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
+	)]
 	pub signer: Signer<'info>,
 
 	pub system_program: Program<'info, System>,
@@ -58,7 +61,10 @@ pub struct SetPause<'info> {
 	)]
 	pub ato_data: Account<'info, AtoData>,
 
-	#[account(mut)]
+	#[account(
+		mut,
+		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
+	)]
 	pub signer: Signer<'info>,
 
 	pub system_program: Program<'info, System>,
@@ -103,7 +109,7 @@ pub struct ProposalCreate<'info> {
 	
 	#[account(
 		mut,
-		constraint = signer.key() == ato_data.admin
+		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -138,8 +144,10 @@ pub struct Vote<'info> {
 			props_data.key().as_ref(),
 		],
 		bump,
-		payer = voter,
-		space = size_of::<AtoVote>() + 8,
+		payer      = voter ,
+		space      = size_of::<AtoVote>() + 8 ,
+		constraint = ato_data.paused != true,	// ONLY IF NOT PAUSED
+		constraint = ato_data.status != AtoStatus::NotReady as u8, // ONLY IF READY
 	)]
 	pub vote_data: Account<'info, AtoVote>,
 
