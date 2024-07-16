@@ -20,8 +20,16 @@ async function confirmTransaction(tx) {
   });
 }
 
-//-const newKeypair = anchor.web3.Keypair.generate();
-//-await airdropSol(newKeypair.publicKey, 1); // 1 SOL
+async function getAccounts(amount) {
+  let accounts: any[];
+  let i = 0;
+  for( i=0; i<10; i++) {
+    const account = anchor.web3.Keypair.generate();
+    await airdropSol(account, amount);
+    accounts = accounts.concat(account);
+  }
+  return accounts;
+}
 
 
 describe("ato", () => {
@@ -46,7 +54,7 @@ describe("ato", () => {
 
   it("initialized(): Is initialized!", async () => {
     await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
-    //await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
+    await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
 
     const tx = await program.methods
       .initialize()
@@ -250,10 +258,10 @@ describe("ato", () => {
     const tailIndex = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
     ).proposalIndexTail.valueOf();
-    console.log(tailIndex);
+    //console.log(tailIndex);
     const propsIndexBuffer = Buffer.allocUnsafe(2);
     propsIndexBuffer.writeUInt16LE(tailIndex, 0);
-    console.log(propsIndexBuffer);
+    //console.log(propsIndexBuffer);
 
     // Calculer l'adresse de la PDA
     const [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
@@ -304,10 +312,10 @@ describe("ato", () => {
     const tailIndex = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
     ).proposalIndexTail.valueOf();
-    console.log(tailIndex);
+    //console.log(tailIndex);
     const propsIndexBuffer = Buffer.allocUnsafe(2);
     propsIndexBuffer.writeUInt16LE(tailIndex, 0);
-    console.log(propsIndexBuffer);
+    //console.log(propsIndexBuffer);
 
     // Calculer l'adresse de la PDA
     const [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(

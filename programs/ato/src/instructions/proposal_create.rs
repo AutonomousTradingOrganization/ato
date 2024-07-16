@@ -13,14 +13,13 @@ pub fn call(
 	threshold  : u64,
 	deadline   : u64,
 ) -> Result<()> {
+// {
 // 	msg!("{}", line!());
 // 	msg!("{}", title);
-// {
 // 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
 // 	msg!("{:?}", props_data.key());
 // }
-	admin_only!(ctx);
-	//-pausable!(ctx);
+//	admin_only!(ctx);	// <-- useless, resolve by constraint (see states.rs)
 
 	// sanity checks !
 	require_gt!(AtoProposalMode::MAX as u8, mode,   AtoError::IncorrectProposalMode);

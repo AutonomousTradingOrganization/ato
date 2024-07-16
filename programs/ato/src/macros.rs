@@ -23,10 +23,9 @@ macro_rules! admin_only {
 macro_rules! pausable {
 	($ctx:expr) => {
 		let ato_data = &mut $ctx.accounts.ato_data;
-		require_eq!(ato_data.paused, false, AtoError::ProgramPaused);
+		if ato_data.paused { return Ok(())}
 	};
 }
-
 
 macro_rules! string_to_u8 {
 	($string:expr, $storage_title:expr) => {{
