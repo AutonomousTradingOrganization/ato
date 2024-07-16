@@ -22,7 +22,6 @@ pub mod ato {
 	}
 
 	pub fn set_scheduler(ctx: Context<SetScheduler>, key: Pubkey) -> Result<()> {
-		
 		set_scheduler::call(ctx, key)
 	}
 
@@ -38,15 +37,16 @@ pub mod ato {
 		threshold  : u64,
 		deadline   : u64,
 	 ) -> Result<()> {
-		proposal_create::call(
-			ctx,
-			title,
-			description,
-			mode,
-			threshold,
-			deadline
-		)
+		proposal_create::call(ctx, title, description, mode, threshold, deadline)
 	}
+
+	pub fn vote(
+		ctx : Context<Vote>,
+		vote: bool,
+	) -> Result<()> {
+		vote::call(ctx, vote)
+	}
+
 
 }
 

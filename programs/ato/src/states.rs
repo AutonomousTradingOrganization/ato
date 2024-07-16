@@ -86,7 +86,7 @@ pub struct ProposalCreate<'info> {
 	#[account(
 		init,
 		seeds = [
-			ATO_LABEL_PROPOSAL.as_ref(),	//b"ATO_PROP".as_ref(),
+			ATO_LABEL_PROPOSAL.as_ref(),
 			signer.key().as_ref(),
 			ato_data.proposal_index_tail.to_le_bytes().as_ref(),
 		],
@@ -106,6 +106,53 @@ pub struct ProposalCreate<'info> {
 		constraint = signer.key() == ato_data.admin
 	)]
 	pub signer: Signer<'info>,
+
+	pub system_program: Program<'info, System>,
+}
+
+
+
+#[account]
+#[derive(InitSpace)]
+pub struct AtoVote {
+	//-pub voter         : Pubkey,
+	pub amount        : u64,
+	pub timestamp     : u64,
+	pub proposal_index: u16,
+	pub vote          : bool,
+	// false = no
+	// true  = yes
+
+}
+
+
+
+#[derive(Accounts)]
+pub struct Vote<'info> {
+
+	#[account(
+		init,
+		seeds = [
+			ATO_LABEL_VOTE.as_ref(),
+			voter.key().as_ref(),
+			props_data.key().as_ref(),
+		],
+		bump,
+		payer = voter,
+		space = size_of::<AtoVote>() + 8,
+	)]
+	pub vote_data: Account<'info, AtoVote>,
+
+	#[account(mut)]
+	pub props_data: Account<'info, AtoProposal>,
+
+	#[account(mut)]
+	pub ato_data: Account<'info, AtoData>,
+	
+	#[account(
+		mut,
+	)]
+	pub voter: Signer<'info>,
 
 	pub system_program: Program<'info, System>,
 }
