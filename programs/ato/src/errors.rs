@@ -30,4 +30,10 @@ pub enum AtoError {
 	#[msg("Too small deadline.")]
 	TooSmallDeadline,
 
+	#[msg("Over deadline.")]
+	OverDeadline,
+
+	#[msg("Incorrect amount.")]
+	IncorrectAmount,
+
 }

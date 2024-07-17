@@ -23,7 +23,7 @@ impl From<u8> for AtoStatus {
 		match value {
 			0 => AtoStatus::NotReady,
 			1 => AtoStatus::Ready,
-			2 => AtoStatus::Paused,
+			//2 => AtoStatus::Paused,
 			_ => panic!("Invalid AtoStatus value"),
 		}
 	}
@@ -32,7 +32,7 @@ impl From<u8> for AtoStatus {
 
 pub enum AtoProposalStatus {
 	Waiting,	// Presentation, you can't vote for it yet...
-	Launched,	// Ready, you can vote for it
+	Opened,	// Ready, you can vote for it
 	Closed,		// Sorry, vote is over
 	Paused,		// Damned !
 	Canceled,	// Proposal is canceled, leave it !
@@ -44,7 +44,7 @@ impl From<u8> for AtoProposalStatus {
 	fn from(value: u8) -> Self {
 		match value {
 			0 => AtoProposalStatus::Waiting,
-			1 => AtoProposalStatus::Launched,
+			1 => AtoProposalStatus::Opened,
 			2 => AtoProposalStatus::Closed,
 			3 => AtoProposalStatus::Paused,
 			4 => AtoProposalStatus::Canceled,

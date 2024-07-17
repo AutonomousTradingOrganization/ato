@@ -6,7 +6,7 @@ use crate::errors;      pub use errors::AtoError;
 
 
 pub fn call(ctx: Context<SetScheduler>, key: Pubkey) -> Result<()> {
-	//-admin_only!(ctx);
+	admin_only!(ctx);
 
 	let ato_data: &mut Account<AtoData> = &mut ctx.accounts.ato_data;
 

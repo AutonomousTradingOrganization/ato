@@ -19,9 +19,18 @@ pub fn call(
 // 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
 // 	msg!("{:?}", props_data.key());
 // }
-//	admin_only!(ctx);	// <-- useless, resolve by constraint (see states.rs)
+// debug purpose
+// {
+// 	// let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
+// 	msg!("{:?}", title);
+// 	msg!("{:?}", mode);
+// 	msg!("{:?}", title.len());
+// 	msg!("{:?}", deadline);
+// }
+// debug purpose
 
 	// sanity checks !
+	admin_only!(ctx);
 	require_gt!(AtoProposalMode::MAX as u8, mode,   AtoError::IncorrectProposalMode);
 	require_gte!(STR_SIZE_TITLE, title.len(),       AtoError::IncorrectTitleLenght);
 	require_gte!(STR_SIZE_DESCR, description.len(), AtoError::IncorrectDescriptionLenght);
@@ -41,7 +50,7 @@ pub fn call(
 	props_data.vote_no   = 0;	// no NO
 	string_to_u8!(title, props_data.title);
 	string_to_u8!(description, props_data.description);
-	props_data.status    = AtoProposalStatus::Waiting as u8;
+	props_data.status    = AtoProposalStatus::Opened as u8;
 
 // debug purpose
 	// msg!("{:?}", props_data.title);
@@ -52,7 +61,6 @@ pub fn call(
 
 	// one more proposal pending...
 	ato_data.proposal_index_tail += 1;
-	ato_data.status               = AtoProposalStatus::Waiting as u8;
 
 	Ok(())
 

@@ -45,7 +45,7 @@ pub struct SetScheduler<'info> {
 
 	#[account(
 		mut,
-		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
+		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -63,7 +63,7 @@ pub struct SetPause<'info> {
 
 	#[account(
 		mut,
-		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
+		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -109,7 +109,7 @@ pub struct ProposalCreate<'info> {
 	
 	#[account(
 		mut,
-		constraint = signer.key() == ato_data.admin	//ADMIN ONLY
+		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -124,7 +124,7 @@ pub struct AtoVote {
 	//-pub voter         : Pubkey,
 	pub amount        : u64,
 	pub timestamp     : u64,
-	pub proposal_index: u16,
+	//pub proposal_index: u16,
 	pub vote          : bool,
 	// false = no
 	// true  = yes
@@ -134,6 +134,7 @@ pub struct AtoVote {
 
 
 #[derive(Accounts)]
+#[instruction(amount: u64, now: u64)]
 pub struct Vote<'info> {
 
 	#[account(
@@ -146,8 +147,12 @@ pub struct Vote<'info> {
 		bump,
 		payer      = voter ,
 		space      = size_of::<AtoVote>() + 8 ,
-		constraint = ato_data.paused != true,	// ONLY IF NOT PAUSED
-		constraint = ato_data.status != AtoStatus::NotReady as u8, // ONLY IF READY
+
+		// constraint = ato_data.paused == false,	// ONLY IF NOT PAUSED
+		// constraint = ato_data.status == AtoStatus::Ready as u8, // ONLY IF READY
+		// constraint = props_data.status == AtoProposalStatus::Opened as u8,
+		// constraint = amount >= ATO_AMOUNT_LAMPORTS_MIN,
+		// constraint = now <= props_data.deadline,
 	)]
 	pub vote_data: Account<'info, AtoVote>,
 

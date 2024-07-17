@@ -47,6 +47,7 @@ describe("ato", () => {
 
   const walletIimposter = anchor.web3.Keypair.generate();
   const walletScheduler = anchor.web3.Keypair.generate();
+  let walletAlain: anchor.web3.Signer;
 
   const ATO_STATUS_NOT_READY  = 0;
   const ATO_STATUS_READY      = 1;
@@ -55,7 +56,10 @@ describe("ato", () => {
   const ATO_PROPS_MODE_OVER  = 0;
   const ATO_PROPS_MODE_LOWER = 1;
   const ATO_PROPS_MODE_DELAY = 2;
-
+  
+  let prop1: { pubkey: anchor.web3.PublicKey; bump: number; };
+  let prop2: { pubkey: anchor.web3.PublicKey; bump: number; };
+  
   it("initialized(): Is initialized!", async () => {
     await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
     await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
@@ -150,7 +154,7 @@ describe("ato", () => {
     
     expect(pausedValueToTrue).to.equal(true);
 
-    const txPauseToFalsee = await program.methods
+    const txPauseToFalse = await program.methods
     .setPause(false)
     .accounts({
       atoData      : atoDataKeypair.publicKey,
@@ -170,7 +174,7 @@ describe("ato", () => {
 
   it("set_pause(): Check admin only", async () => {
     try {
-      const txPauseToFalsee = await program.methods
+      const txPauseToFalse = await program.methods
       .setPause(false)
       .accounts({
         atoData      : atoDataKeypair.publicKey,
@@ -183,7 +187,7 @@ describe("ato", () => {
       expect.fail("The transaction setPause() should have failed but it didn't.");
 
     } catch(err) {
-      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
+      expect(err.message).to.include("Admin only operation.");
     }
 
   });
@@ -204,7 +208,7 @@ describe("ato", () => {
     expect(getStatusBefore).to.equal(ATO_STATUS_NOT_READY);
 
 
-    const txPauseToFalsee = await program.methods
+    const txPauseToFalse = await program.methods
     .setScheduler(walletScheduler.publicKey)
     .accounts({
       atoData      : atoDataKeypair.publicKey,
@@ -246,7 +250,8 @@ describe("ato", () => {
       expect.fail("The transaction set_scheduler() should have failed but it didn't.");
 
     } catch(err) {
-      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
+      //console.log(err.message);
+      expect(err.message).to.include("Admin only operation.");
     }
 
   });
@@ -257,7 +262,7 @@ describe("ato", () => {
     const description = "This is a test proposal";
     const mode        = ATO_PROPS_MODE_OVER;
     const threshold   = 1;
-    const deadline    = 60;
+    const deadline    = 4919;// -> 1337 (hexa);
 
     const tailIndex = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
@@ -282,6 +287,8 @@ describe("ato", () => {
       bump  : propsBump,
     };
 
+    prop1 = props;
+
     let txProp1 = await program.methods
       .proposalCreate(
         title,
@@ -299,8 +306,7 @@ describe("ato", () => {
       //.signers([provider.wallet])
       .rpc();
 
-      console.log("");
-      console.log("https://solana.fm/tx/"+txProp1);
+      console.log("(prop #1) https://solana.fm/tx/"+txProp1);
       console.log("");
 
   });
@@ -336,7 +342,9 @@ describe("ato", () => {
       bump  : propsBump,
     };
 
-    let txProp1 = await program.methods
+    prop2 = props;
+
+    let txProp2 = await program.methods
       .proposalCreate(
         title,
         description,
@@ -353,8 +361,7 @@ describe("ato", () => {
       //.signers([provider.wallet])
       .rpc();
 
-      console.log("");
-      console.log("https://solana.fm/tx/"+txProp1);
+      console.log("(prop #2) https://solana.fm/tx/"+txProp2);
       console.log("");
 
   });
@@ -415,12 +422,7 @@ describe("ato", () => {
       // console.log("---");
       // console.log(err.message);
       // console.log("---");
-      expect(err.message).to.include("Error Number: 2003. Error Message: A raw constraint was violated.");
-      
-
-      // console.log("");
-      // console.log("https://solana.fm/tx/"+txProp1);
-      // console.log("");
+      expect(err.message).to.include("Admin only operation.");
 
     }
 
@@ -428,17 +430,237 @@ describe("ato", () => {
 
 
   it("vote(): attempt to vote", async () => {
+
     const accounts = await createAccounts(1, 2);
-    const walletAlain   = accounts[0];
-    //const walletBernard = accounts[1];
-    //const walletCeline  = accounts[2];
-    // console.log(walletAlain.publicKey.toString());
-    // console.log(walletBernard.publicKey.toString());
-    // console.log(walletCeline.publicKey.toString());
+    walletAlain = accounts[0];
+
+    const propsIndex = 0;
+    const propsIndexBuffer = Buffer.allocUnsafe(2);
+    propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+    //console.log(propsIndexBuffer);
+
+    const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from("ATO_VOTE"),
+        walletAlain.publicKey.toBuffer(),
+        prop1.pubkey.toBuffer(),
+      ],
+      program.programId
+    );
+
+    let vote = {
+      pubkey: votePubkey,
+      bump  : voteBump,
+    };
 
 
+    const atoPaused = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).paused.valueOf();
 
-    //
+    const atoStatus = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).status.valueOf();
+
+    const amount = 200000;
+    const now = 19;
+
+    // console.log("ato paused  "+atoPaused);
+    // console.log("ato status  "+atoStatus);
+    // console.log("amount      "+amount);
+    // console.log("timestamp   "+now);
+
+    let txVote = await program.methods
+      .vote(
+        true,
+        new anchor.BN(amount),  // amount (Lamports >= MIN)
+        new anchor.BN(now)      // now (s < proposal deadline)
+      )
+      .accounts({
+        voteData     : vote.pubkey,
+        propsData    : prop1.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        voter        : walletAlain.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([walletAlain])
+      .rpc();
+
+      console.log("https://solana.fm/tx/"+txVote);
+      console.log("");
+
+    });
+
+
+    it("vote(): try & fail to vote again (same voter)", async () => {
+
+      try {
+        const propsIndex = 0;
+        const propsIndexBuffer = Buffer.allocUnsafe(2);
+        propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+        //console.log(propsIndexBuffer);
+
+        const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+          [
+            Buffer.from("ATO_VOTE"),
+            walletAlain.publicKey.toBuffer(),
+            prop1.pubkey.toBuffer(),
+          ],
+          program.programId
+        );
+
+        let vote = {
+          pubkey: votePubkey,
+          bump  : voteBump,
+        };
+
+
+        const atoPaused = (
+          await program.account.atoData.fetch(atoDataKeypair.publicKey)
+        ).paused.valueOf();
+
+        const atoStatus = (
+          await program.account.atoData.fetch(atoDataKeypair.publicKey)
+        ).status.valueOf();
+
+        const amount = 200000;
+        const now = 19;
+
+        // console.log("ato paused  "+atoPaused);
+        // console.log("ato status  "+atoStatus);
+        // console.log("amount      "+amount);
+        // console.log("timestamp   "+now);
+
+        let txVote = await program.methods
+          .vote(
+            true,
+            new anchor.BN(amount),  // amount (Lamports >= MIN)
+            new anchor.BN(now)      // now (s < proposal deadline)
+          )
+          .accounts({
+            voteData     : vote.pubkey,
+            propsData    : prop1.pubkey,
+            atoData      : atoDataKeypair.publicKey,
+            voter        : walletAlain.publicKey,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .signers([walletAlain])
+          .rpc();
+
+          console.log("----");
+          console.log("https://solana.fm/tx/"+txVote);
+          console.log("----");
+          expect.fail("The transaction vote() should have failed but it didn't.");
+
+      } catch(err) {
+        // console.log("---");
+        // console.log(err.message);
+        // console.log("---");
+        expect(err.message).to.include("already in use");
+
+      }
+
+    });
+
+
+    it("vote(): check pausable", async () => {
+      const txPauseToTrue = await program.methods
+      .setPause(true)
+      .accounts({
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+      const pausedValueToTrue = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).paused.valueOf();
+      
+      expect(pausedValueToTrue).to.equal(true);
+
+///
+      try {
+
+      const propsIndex = 1;
+      const propsIndexBuffer = Buffer.allocUnsafe(2);
+      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+      //console.log(propsIndexBuffer);
+
+      const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("ATO_VOTE"),
+          walletAlain.publicKey.toBuffer(),
+          prop2.pubkey.toBuffer(),
+        ],
+        program.programId
+      );
+
+      let vote = {
+        pubkey: votePubkey,
+        bump  : voteBump,
+      };
+
+      // const atoPaused = (
+      //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      // ).paused.valueOf();
+      // console.log("ato paused "+atoPaused);
+
+      // const atoStatus = (
+      //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      // ).status.valueOf();
+
+      const amount = 200000;
+      const now = 19;
+
+      let txVote = await program.methods
+        .vote(
+          true,
+          new anchor.BN(amount),  // amount (Lamports >= MIN)
+          new anchor.BN(now)      // now (s < proposal deadline)
+        )
+        .accounts({
+          voteData     : vote.pubkey,
+          propsData    : prop2.pubkey,
+          atoData      : atoDataKeypair.publicKey,
+          voter        : walletAlain.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([walletAlain])
+        .rpc();
+
+        console.log("https://solana.fm/tx/"+txVote);
+        console.log("");
+
+        expect.fail("The transaction vote() should have failed but it didn't.");
+
+      } catch(err) {
+        // console.log(err.message);
+        // console.log("");
+        expect(err.message).to.include("Program paused.");
+  
+      }
+  
+
+///
+
+      const txPauseToFalse = await program.methods
+      .setPause(false)
+      .accounts({
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+      const pausedValueToFalseAgain = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).paused.valueOf();
+    
+      //console.log("p2");
+      expect(pausedValueToFalseAgain).to.equal(false);
+      //console.log("p2");
+
+    });
+
   });
-
-});

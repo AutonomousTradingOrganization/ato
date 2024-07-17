@@ -41,10 +41,12 @@ pub mod ato {
 	}
 
 	pub fn vote(
-		ctx : Context<Vote>,
-		vote: bool,
+		ctx   : Context<Vote>,
+		vote  : bool,
+		amount: u64,
+		now   : u64
 	) -> Result<()> {
-		vote::call(ctx, vote)
+		vote::call(ctx, vote, amount, now)
 	}
 
 
