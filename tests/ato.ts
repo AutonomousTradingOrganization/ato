@@ -309,7 +309,7 @@ describe("ato", () => {
         new anchor.BN(threshold),
         new anchor.BN(deadline)
       ).accounts({
-        propsData    : props.pubkey,
+        propData    : props.pubkey,
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -364,7 +364,7 @@ describe("ato", () => {
         new anchor.BN(deadline)
       )
       .accounts({
-        propsData    : props.pubkey,
+        propData    : props.pubkey,
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -419,7 +419,7 @@ describe("ato", () => {
           new anchor.BN(deadline)
         )
         .accounts({
-          propsData    : props.pubkey,
+          propData    : props.pubkey,
           atoData      : atoDataKeypair.publicKey,
           signer       : walletIimposter.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -529,7 +529,7 @@ describe("ato", () => {
       )
       .accounts({
         voteData     : vote.pubkey,
-        propsData    : prop1.pubkey,
+        propData     : prop1.pubkey,
         atoData      : atoDataKeypair.publicKey,
         voter        : walletAlain.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -590,7 +590,7 @@ describe("ato", () => {
           )
           .accounts({
             voteData     : vote.pubkey,
-            propsData    : prop1.pubkey,
+            propData     : prop1.pubkey,
             atoData      : atoDataKeypair.publicKey,
             voter        : walletAlain.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
@@ -671,7 +671,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
-          propsData    : prop2.pubkey,
+          propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletAlain.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -745,7 +745,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
-          propsData    : prop2.pubkey,
+          propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletBernard.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -802,7 +802,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
-          propsData    : prop2.pubkey,
+          propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletBernard.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -836,7 +836,7 @@ describe("ato", () => {
         const txPauseToTrue = await program.methods
         .proposalSetStatus(ATO_PROPS_STATUS_CANCELED)
         .accounts({
-          propsData    : prop2.pubkey,
+          propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           signer       : provider.wallet.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -879,7 +879,7 @@ describe("ato", () => {
           )
           .accounts({
             voteData     : vote.pubkey,
-            propsData    : prop2.pubkey,
+            propData     : prop2.pubkey,
             atoData      : atoDataKeypair.publicKey,
             voter        : walletBernard.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
@@ -902,7 +902,7 @@ describe("ato", () => {
       const txPauseToTrue = await program.methods
       .proposalSetStatus(ATO_PROPS_STATUS_OPENED)
       .accounts({
-        propsData    : prop2.pubkey,
+        propData     : prop2.pubkey,
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,

@@ -17,13 +17,13 @@ pub fn call(
 // {
 // 	msg!("{}", line!());
 // 	msg!("{}", title);
-// 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
-// 	msg!("{:?}", props_data.key());
+// 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
+// 	msg!("{:?}", prop_data.key());
 // }
 
 // debug purpose
 // {
-// 	// let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
+// 	// let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 // 	msg!("{:?}", title);
 // 	msg!("{:?}", mode);
 // 	msg!("{:?}", title.len());
@@ -42,26 +42,26 @@ pub fn call(
 	//-msg!("{}", line!());
 
 	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
-	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
+	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 
-	props_data.signer           = ctx.accounts.signer.key();
-	props_data.deadline         = deadline;
-	props_data.mode             = mode;
-	props_data.threshold        = threshold;
-	props_data.amount           = 0;
-	props_data.vote_yes         = 0; // 0 YES
-	props_data.vote_no          = 0; // 0 NO
-	props_data.voter_index_head = 0;
-	props_data.voter_index_tail = 0;
-	string_to_u8!(title, props_data.title);
-	string_to_u8!(description, props_data.description);
-	props_data.status    = AtoProposalStatus::Opened as u8;
+	prop_data.signer           = ctx.accounts.signer.key();
+	prop_data.deadline         = deadline;
+	prop_data.mode             = mode;
+	prop_data.threshold        = threshold;
+	prop_data.amount           = 0;
+	prop_data.vote_yes         = 0; // 0 YES
+	prop_data.vote_no          = 0; // 0 NO
+	prop_data.voter_index_head = 0;
+	prop_data.voter_index_tail = 0;
+	string_to_u8!(title, prop_data.title);
+	string_to_u8!(description, prop_data.description);
+	prop_data.status    = AtoProposalStatus::Opened as u8;
 
 // debug purpose
-	// msg!("{:?}", props_data.title);
-	// msg!("{:?}", props_data.description);
-	// msg!("{:?}", props_data.mode);
-	// msg!("{:?}", props_data.deadline);
+	// msg!("{:?}", prop_data.title);
+	// msg!("{:?}", prop_data.description);
+	// msg!("{:?}", prop_data.mode);
+	// msg!("{:?}", prop_data.deadline);
 // debug purpose
 
 	// one more proposal pending...

@@ -103,7 +103,7 @@ pub struct ProposalCreate<'info> {
 		payer = signer,
 		space = size_of::<AtoProposal>() + 8
 	)]
-	pub props_data: Account<'info, AtoProposal>,
+	pub prop_data: Account<'info, AtoProposal>,
 
 	#[account(
 		mut,
@@ -144,7 +144,7 @@ pub struct Vote<'info> {
 		seeds = [
 			ATO_LABEL_VOTE.as_ref(),
 			voter.key().as_ref(),
-			props_data.key().as_ref(),
+			prop_data.key().as_ref(),
 		],
 		bump,
 		payer = voter ,
@@ -153,7 +153,7 @@ pub struct Vote<'info> {
 	pub vote_data: Account<'info, AtoVote>,
 
 	#[account(mut)]
-	pub props_data: Account<'info, AtoProposal>,
+	pub prop_data: Account<'info, AtoProposal>,
 
 	#[account(mut)]
 	pub ato_data: Account<'info, AtoData>,
@@ -174,7 +174,7 @@ pub struct ProposalSetStatus<'info> {
 	#[account(
 		mut,
 	)]
-	pub props_data: Account<'info, AtoProposal>,
+	pub prop_data: Account<'info, AtoProposal>,
 	
 	#[account(
 		mut,
