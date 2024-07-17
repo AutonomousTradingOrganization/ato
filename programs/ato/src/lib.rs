@@ -47,6 +47,16 @@ pub mod ato {
 		proposal_set_status::call(ctx, status)
 	}
 
+	pub fn voter_registration(
+		ctx  : Context<VoterAdd>,
+		name : String,
+		email: String,
+	) -> Result<()> {
+		voter_registration::call(ctx, name, email)
+	}
+
+
+
 	pub fn vote(
 		ctx   : Context<Vote>,
 		vote  : bool,

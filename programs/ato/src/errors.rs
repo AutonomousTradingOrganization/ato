@@ -6,6 +6,9 @@ pub enum AtoError {
 	#[msg("Admin only operation.")]
 	AdminOnly,
 
+	#[msg("Scheduler only operation.")]
+	SchedulerOnly,
+
 	#[msg("Head index cannot exceed tail index.")]
 	HeadIndexError,
 
@@ -18,11 +21,17 @@ pub enum AtoError {
 	#[msg("Incorrect proposal mode.")]
 	IncorrectProposalMode,
 
-	#[msg("Incorrect title lenght.")]
+	#[msg("Incorrect title length.")]
 	IncorrectTitleLenght,
 
-	#[msg("Incorrect description lenght.")]
+	#[msg("Incorrect description length.")]
 	IncorrectDescriptionLenght,
+
+	#[msg("Incorrect name length.")]
+	IncorrectNameLenght,
+
+	#[msg("Incorrect email length.")]
+	IncorrectEmailLenght,
 
 	#[msg("Too big deadline.")]
 	TooBigDeadline,

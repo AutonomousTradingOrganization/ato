@@ -50,6 +50,7 @@ describe("ato", () => {
 
   let walletAlain  : anchor.web3.Signer;
   let walletBernard: anchor.web3.Signer;
+  let walletCeline:  anchor.web3.Signer;
 
   const ATO_STATUS_NOT_READY  = 0;
   const ATO_STATUS_READY      = 1;
@@ -307,8 +308,7 @@ describe("ato", () => {
         mode,
         new anchor.BN(threshold),
         new anchor.BN(deadline)
-      )
-      .accounts({
+      ).accounts({
         propsData    : props.pubkey,
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
@@ -440,12 +440,50 @@ describe("ato", () => {
   });
 
 
-  it("vote(): attempt to vote", async () => {
-
+  it("voter_registration(): do it...", async () => {
     const accounts = await createAccounts(5, 2);
 
     walletAlain   = accounts[0];
     walletBernard = accounts[1];
+    walletCeline  = accounts[2];
+
+    const name  = "Alain Alain";
+    const email = "alain@gmail.com";
+
+    // Calculer l'adresse de la PDA
+    const [alainPubkey, alainBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from("ATO_VOTER"),
+        walletAlain.publicKey.toBuffer(),
+      ],
+      program.programId
+    );
+    
+    let voterAlain = {
+      pubkey: alainPubkey,
+      bump  : alainBump,
+    };
+
+    let txVoterReg = await program.methods
+      .voterRegistration(
+        name,
+        email,
+      ).accounts({
+        voterData    : voterAlain.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        voter        : walletAlain.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([walletAlain])
+      .rpc();
+
+    console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
+    console.log("");
+
+  });
+
+
+  it("vote(): attempt to vote", async () => {
 
     const propsIndex = 0;
     const propsIndexBuffer = Buffer.allocUnsafe(2);

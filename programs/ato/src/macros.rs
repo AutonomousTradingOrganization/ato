@@ -19,6 +19,14 @@ macro_rules! admin_only {
 	}};
 }
 
+macro_rules! scheduler_only {
+	($ctx:expr) => {{
+		let ato_data = &mut $ctx.accounts.ato_data;
+		let signer = &$ctx.accounts.signer;
+		require_eq!(ato_data.scheduler, signer.key(), AtoError::SchedulerOnly);
+	}};
+}
+
 macro_rules! pausable {
 	($ctx:expr) => {{
 		let ato_data = &mut $ctx.accounts.ato_data;

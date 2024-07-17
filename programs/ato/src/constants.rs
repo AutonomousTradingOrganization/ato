@@ -3,13 +3,15 @@ pub const DEADLINE_MIN: u64 = 1;	// 1 second
 pub const DEADLINE_MAX: u64 = 60 * 60 * 24 * 30;	// 30 days
 
 pub const ATO_LABEL_PROPOSAL: &[u8; 8] = b"ATO_PROP";
-//? pub const ATO_LABEL_VOTER: &[u8; 9]    = b"ATO_VOTER";
+pub const ATO_LABEL_VOTER: &[u8; 9]    = b"ATO_VOTER";
 pub const ATO_LABEL_VOTE: &[u8; 8]     = b"ATO_VOTE";
 
 pub const ATO_AMOUNT_LAMPORTS_MIN: u64 = 100000;
 
 pub const STR_SIZE_TITLE: usize = 32;
 pub const STR_SIZE_DESCR: usize = 100;
+pub const STR_SIZE_NAME: usize  = 64;
+pub const STR_SIZE_EMAIL: usize = 64;
 
 
 pub enum AtoStatus {

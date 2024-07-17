@@ -13,12 +13,14 @@ pub fn call(
 	threshold  : u64,
 	deadline   : u64,
 ) -> Result<()> {
+
 // {
 // 	msg!("{}", line!());
 // 	msg!("{}", title);
 // 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
 // 	msg!("{:?}", props_data.key());
 // }
+
 // debug purpose
 // {
 // 	// let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
@@ -42,12 +44,15 @@ pub fn call(
 	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
 	let props_data: &mut Account<AtoProposal> = &mut ctx.accounts.props_data;
 
-	props_data.signer    = ctx.accounts.signer.key();
-	props_data.deadline  = deadline;
-	props_data.mode      = mode;
-	props_data.threshold = threshold;
-	props_data.vote_yes  = 0;	// no YES
-	props_data.vote_no   = 0;	// no NO
+	props_data.signer           = ctx.accounts.signer.key();
+	props_data.deadline         = deadline;
+	props_data.mode             = mode;
+	props_data.threshold        = threshold;
+	props_data.amount           = 0;
+	props_data.vote_yes         = 0; // 0 YES
+	props_data.vote_no          = 0; // 0 NO
+	props_data.voter_index_head = 0;
+	props_data.voter_index_tail = 0;
 	string_to_u8!(title, props_data.title);
 	string_to_u8!(description, props_data.description);
 	props_data.status    = AtoProposalStatus::Opened as u8;

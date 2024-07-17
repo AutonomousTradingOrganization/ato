@@ -10,6 +10,9 @@ pub mod set_pause;
 pub mod proposal_create;
 //pub use proposal_create::*;
 
+pub mod voter_registration;
+//pub use voter_registration::*;
+
 pub mod vote;
 //pub use vote::*;
 
