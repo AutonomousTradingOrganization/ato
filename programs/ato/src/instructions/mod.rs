@@ -13,3 +13,5 @@ pub mod proposal_create;
 pub mod vote;
 //pub use vote::*;
 
+pub mod proposal_set_status;
+//pub use proposal_set_status::*;

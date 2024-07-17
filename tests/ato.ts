@@ -47,7 +47,9 @@ describe("ato", () => {
 
   const walletIimposter = anchor.web3.Keypair.generate();
   const walletScheduler = anchor.web3.Keypair.generate();
-  let walletAlain: anchor.web3.Signer;
+
+  let walletAlain  : anchor.web3.Signer;
+  let walletBernard: anchor.web3.Signer;
 
   const ATO_STATUS_NOT_READY  = 0;
   const ATO_STATUS_READY      = 1;
@@ -56,10 +58,19 @@ describe("ato", () => {
   const ATO_PROPS_MODE_OVER  = 0;
   const ATO_PROPS_MODE_LOWER = 1;
   const ATO_PROPS_MODE_DELAY = 2;
-  
+
+  const ATO_PROPS_STATUS_WAITING  = 0;
+  const ATO_PROPS_STATUS_OPENED   = 1;
+  const ATO_PROPS_STATUS_CLOSED   = 2;
+  const ATO_PROPS_STATUS_PAUSED   = 3;
+  const ATO_PROPS_STATUS_CANCELED = 4;
+  const ATO_PROPS_STATUS_ERROR    = 5;
+
+
   let prop1: { pubkey: anchor.web3.PublicKey; bump: number; };
   let prop2: { pubkey: anchor.web3.PublicKey; bump: number; };
-  
+
+
   it("initialized(): Is initialized!", async () => {
     await airdropSol(walletIimposter.publicKey, 1); // 1 SOL
     await airdropSol(walletScheduler.publicKey, 1); // 1 SOL
@@ -431,8 +442,10 @@ describe("ato", () => {
 
   it("vote(): attempt to vote", async () => {
 
-    const accounts = await createAccounts(1, 2);
-    walletAlain = accounts[0];
+    const accounts = await createAccounts(5, 2);
+
+    walletAlain   = accounts[0];
+    walletBernard = accounts[1];
 
     const propsIndex = 0;
     const propsIndexBuffer = Buffer.allocUnsafe(2);
@@ -486,7 +499,7 @@ describe("ato", () => {
       .signers([walletAlain])
       .rpc();
 
-      console.log("https://solana.fm/tx/"+txVote);
+      console.log("(Alain vote for prop #1) https://solana.fm/tx/"+txVote);
       console.log("");
 
     });
@@ -524,7 +537,7 @@ describe("ato", () => {
         ).status.valueOf();
 
         const amount = 200000;
-        const now = 19;
+        const now    = 19;
 
         // console.log("ato paused  "+atoPaused);
         // console.log("ato status  "+atoStatus);
@@ -579,8 +592,7 @@ describe("ato", () => {
       
       expect(pausedValueToTrue).to.equal(true);
 
-///
-      try {
+    try {
 
       const propsIndex = 1;
       const propsIndexBuffer = Buffer.allocUnsafe(2);
@@ -611,7 +623,7 @@ describe("ato", () => {
       // ).status.valueOf();
 
       const amount = 200000;
-      const now = 19;
+      const now    = 19;
 
       let txVote = await program.methods
         .vote(
@@ -641,9 +653,6 @@ describe("ato", () => {
   
       }
   
-
-///
-
       const txPauseToFalse = await program.methods
       .setPause(false)
       .accounts({
@@ -660,6 +669,212 @@ describe("ato", () => {
       //console.log("p2");
       expect(pausedValueToFalseAgain).to.equal(false);
       //console.log("p2");
+
+    });
+
+
+    it("vote(): check amount value", async () => {
+
+      try {
+
+      const propsIndex = 1;
+      const propsIndexBuffer = Buffer.allocUnsafe(2);
+      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+      //console.log(propsIndexBuffer);
+
+      const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("ATO_VOTE"),
+          walletBernard.publicKey.toBuffer(),
+          prop2.pubkey.toBuffer(),
+        ],
+        program.programId
+      );
+
+      let vote = {
+        pubkey: votePubkey,
+        bump  : voteBump,
+      };
+
+      const amount = 20;
+      const now    = 30;
+
+      let txVote = await program.methods
+        .vote(
+          true,
+          new anchor.BN(amount),  // amount (Lamports >= MIN)
+          new anchor.BN(now)      // now (s < proposal deadline)
+        )
+        .accounts({
+          voteData     : vote.pubkey,
+          propsData    : prop2.pubkey,
+          atoData      : atoDataKeypair.publicKey,
+          voter        : walletBernard.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([walletBernard])
+        .rpc();
+
+        console.log("https://solana.fm/tx/"+txVote);
+        console.log("");
+
+        expect.fail("The transaction vote() should have failed but it didn't.");
+
+      } catch(err) {
+        // console.log(err.message);
+        // console.log("----");
+        expect(err.message).to.include("Incorrect amount.");
+  
+      }
+
+    });
+
+
+    it("vote(): check now/deadline values", async () => {
+
+      try {
+
+      const propsIndex = 1;
+      const propsIndexBuffer = Buffer.allocUnsafe(2);
+      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+      //console.log(propsIndexBuffer);
+
+      const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("ATO_VOTE"),
+          walletBernard.publicKey.toBuffer(),
+          prop2.pubkey.toBuffer(),
+        ],
+        program.programId
+      );
+
+      let vote = {
+        pubkey: votePubkey,
+        bump  : voteBump,
+      };
+
+      const amount = 200000;
+      const now    = 100000;
+
+      let txVote = await program.methods
+        .vote(
+          true,
+          new anchor.BN(amount),  // amount (Lamports >= MIN)
+          new anchor.BN(now)      // now (s < proposal deadline)
+        )
+        .accounts({
+          voteData     : vote.pubkey,
+          propsData    : prop2.pubkey,
+          atoData      : atoDataKeypair.publicKey,
+          voter        : walletBernard.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([walletBernard])
+        .rpc();
+
+        console.log("https://solana.fm/tx/"+txVote);
+        console.log("");
+
+        expect.fail("The transaction vote() should have failed but it didn't.");
+
+      } catch(err) {
+        // console.log(err.message);
+        // console.log("----");
+        expect(err.message).to.include("Over deadline.");
+  
+      }
+
+    });
+
+
+    it("vote() + proposal_set_status(): check prop #1 status", async () => {
+
+      try {
+
+
+        // set status of prop2 to AtoProposalStatus::Canceled
+        // check it
+        // 
+        const txPauseToTrue = await program.methods
+        .proposalSetStatus(ATO_PROPS_STATUS_CANCELED)
+        .accounts({
+          propsData    : prop2.pubkey,
+          atoData      : atoDataKeypair.publicKey,
+          signer       : provider.wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+
+        const propsStatusAfter = (
+          await program.account.atoProposal.fetch(prop2.pubkey)
+        ).status.valueOf();
+        expect(propsStatusAfter).to.equal(ATO_PROPS_STATUS_CANCELED);
+
+
+        const propsIndex = 1;
+        const propsIndexBuffer = Buffer.allocUnsafe(2);
+        propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+        //console.log(propsIndexBuffer);
+
+        const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+          [
+            Buffer.from("ATO_VOTE"),
+            walletBernard.publicKey.toBuffer(),
+            prop2.pubkey.toBuffer(),
+          ],
+          program.programId
+        );
+
+        let vote = {
+          pubkey: votePubkey,
+          bump  : voteBump,
+        };
+
+        const amount = 200000;
+        const now    = 10;
+
+        let txVote = await program.methods
+          .vote(
+            true,
+            new anchor.BN(amount),  // amount (Lamports >= MIN)
+            new anchor.BN(now)      // now (s < proposal deadline)
+          )
+          .accounts({
+            voteData     : vote.pubkey,
+            propsData    : prop2.pubkey,
+            atoData      : atoDataKeypair.publicKey,
+            voter        : walletBernard.publicKey,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .signers([walletBernard])
+          .rpc();
+
+          console.log("https://solana.fm/tx/"+txVote);
+          console.log("");
+
+          expect.fail("The transaction vote() should have failed but it didn't.");
+
+      } catch(err) {
+        // console.log(err.message);
+        // console.log("----");
+        expect(err.message).to.include("Incorrect proposal status.");
+  
+      }
+
+      const txPauseToTrue = await program.methods
+      .proposalSetStatus(ATO_PROPS_STATUS_OPENED)
+      .accounts({
+        propsData    : prop2.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+      const propsStatusAfter = (
+        await program.account.atoProposal.fetch(prop2.pubkey)
+      ).status.valueOf();
+      expect(propsStatusAfter).to.equal(ATO_PROPS_STATUS_OPENED);
 
     });
 

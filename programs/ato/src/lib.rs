@@ -40,6 +40,13 @@ pub mod ato {
 		proposal_create::call(ctx, title, description, mode, threshold, deadline)
 	}
 
+	pub fn proposal_set_status(
+		ctx        : Context<ProposalSetStatus>,
+		status     : u8,
+	 ) -> Result<()> {
+		proposal_set_status::call(ctx, status)
+	}
+
 	pub fn vote(
 		ctx   : Context<Vote>,
 		vote  : bool,

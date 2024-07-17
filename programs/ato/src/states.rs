@@ -134,7 +134,6 @@ pub struct AtoVote {
 
 
 #[derive(Accounts)]
-#[instruction(amount: u64, now: u64)]
 pub struct Vote<'info> {
 
 	#[account(
@@ -145,14 +144,8 @@ pub struct Vote<'info> {
 			props_data.key().as_ref(),
 		],
 		bump,
-		payer      = voter ,
-		space      = size_of::<AtoVote>() + 8 ,
-
-		// constraint = ato_data.paused == false,	// ONLY IF NOT PAUSED
-		// constraint = ato_data.status == AtoStatus::Ready as u8, // ONLY IF READY
-		// constraint = props_data.status == AtoProposalStatus::Opened as u8,
-		// constraint = amount >= ATO_AMOUNT_LAMPORTS_MIN,
-		// constraint = now <= props_data.deadline,
+		payer = voter ,
+		space = size_of::<AtoVote>() + 8 ,
 	)]
 	pub vote_data: Account<'info, AtoVote>,
 
@@ -166,6 +159,30 @@ pub struct Vote<'info> {
 		mut,
 	)]
 	pub voter: Signer<'info>,
+
+	pub system_program: Program<'info, System>,
+}
+
+
+
+#[derive(Accounts)]
+//#[instruction(amount: u64)]
+pub struct ProposalSetStatus<'info> {
+
+	#[account(
+		mut,
+	)]
+	pub props_data: Account<'info, AtoProposal>,
+	
+	#[account(
+		mut,
+	)]
+	pub ato_data: Account<'info, AtoData>,
+
+	#[account(
+		mut,
+	)]
+	pub signer: Signer<'info>,
 
 	pub system_program: Program<'info, System>,
 }
