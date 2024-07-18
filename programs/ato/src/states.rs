@@ -130,12 +130,13 @@ pub struct AtoVote {
 	pub voter         : Pubkey,
 	pub amount        : u64,
 	pub timestamp     : u64,
-	// dedug purpose
-	pub leet1: u16,
+	
+	//-pub leet1: u16,	// dedug purpose
 	pub proposal_index: u16,
-	pub voter_index: u16,
-	pub leet2: u16,
-	// dedug purpose
+	pub voter_index:    u16,
+	pub vote_index:     u16,
+	//-pub leet2: u16,// dedug purpose
+
 	pub vote          : bool,
 	// false = no
 	// true  = yes
@@ -155,7 +156,8 @@ pub struct Vote<'info> {
 			//voter.key().as_ref(),
 			//prop_data.key().as_ref(),
 			prop_data.index.to_le_bytes().as_ref(),
-			voter_data.index.to_le_bytes().as_ref(),
+			prop_data.vote_index_tail.to_le_bytes().as_ref(),
+			//voter_data.index.to_le_bytes().as_ref(),
 
 		],
 		bump,

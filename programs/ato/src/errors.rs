@@ -45,4 +45,7 @@ pub enum AtoError {
 	#[msg("Incorrect amount.")]
 	IncorrectAmount,
 
+	#[msg("Already voted.")]
+	AlreadyVoted,
+
 }

@@ -66,7 +66,7 @@ pub fn call(
 
 	// one more proposal pending...
 	prop_data.index = ato_data.proposal_index_tail;
-	msg!("proposal {} / {}", title, prop_data.index);
+	msg!("proposal {} / {}", title, prop_data.index);	// debug purpose
 	ato_data.proposal_index_tail += 1;
 
 	Ok(())

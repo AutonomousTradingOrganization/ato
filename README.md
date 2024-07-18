@@ -5,7 +5,7 @@
 
 ### Local validator
 
-`solana-test-validator --reset`
+`solana-test-validator --reset  `
 
 Beware it creates local files and directories at the current working directory.
 

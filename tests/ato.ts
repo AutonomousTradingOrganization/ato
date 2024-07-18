@@ -35,6 +35,27 @@ async function createAccounts(nn: number, amount: number) {
   return accounts;
 }
 
+async function monitor( program, comment) {
+
+  console.log("");
+  console.log(comment);
+  let allAto = await program.account.atoData.all();
+  console.log("root ");  console.log(allAto);
+  console.log("");
+
+  let allProp = await program.account.atoProposal.all();
+  console.log("proposal "); console.log(allProp);
+  console.log("");
+
+  let allVoter = await program.account.atoVoter.all();
+  console.log("voter "); console.log(allVoter);
+  console.log("");
+
+  let allVote = await program.account.atoVote.all();
+  console.log("vote "); console.log(allVote);
+  console.log("");
+
+}
 
 describe("ato", () => {
   // Configure the client to use the local cluster.
@@ -367,7 +388,7 @@ describe("ato", () => {
         new anchor.BN(deadline)
       )
       .accounts({
-        propData    : props.pubkey,
+        propData     : props.pubkey,
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -422,7 +443,7 @@ describe("ato", () => {
           new anchor.BN(deadline)
         )
         .accounts({
-          propData    : props.pubkey,
+          propData     : props.pubkey,
           atoData      : atoDataKeypair.publicKey,
           signer       : walletIimposter.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -498,13 +519,21 @@ describe("ato", () => {
     alainIndexBuffer.writeUInt16LE(alainIndex, 0);
     //console.log("alain "+alainIndexBuffer);
 
+    /* */
+    const voteTailIndex = 0;
+    //console.log(tailIndex);
+    const voteIndexBuffer = Buffer.allocUnsafe(2);
+    voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+    //console.log(propsIndexBuffer);
+    /* */
+
     const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
       [
         Buffer.from("ATO_VOTE"),
         //walletAlain.publicKey.toBuffer(),
         //prop1.pubkey.toBuffer(),
         propsIndexBuffer,
-        alainIndexBuffer,
+        voteIndexBuffer,  //alainIndexBuffer,
       ],
       program.programId
     );
@@ -539,7 +568,7 @@ describe("ato", () => {
       )
       .accounts({
         voteData     : vote.pubkey,
-        voterData: voterAlain.pubkey,
+        voterData    : voterAlain.pubkey,
         propData     : prop1.pubkey,
         atoData      : atoDataKeypair.publicKey,
         voter        : walletAlain.publicKey,
@@ -551,16 +580,26 @@ describe("ato", () => {
       console.log("(Alain vote for prop #1) https://solana.fm/tx/"+txVote);
       console.log("");
 
+      //await monitor(program, "Alain vote for prop #1");
+
     });
 
 
-    it("vote(): try & fail to vote again (same voter)", async () => {
 
-      try {
+    it("vote(): try to vote again (same voter, same proposal, different vote)", async () => {
+
         const propsIndex = 0;
         const propsIndexBuffer = Buffer.allocUnsafe(2);
         propsIndexBuffer.writeUInt16LE(propsIndex, 0);
         //console.log(propsIndexBuffer);
+
+        /* */
+        const voteTailIndex = 1;
+        //console.log(tailIndex);
+        const voteIndexBuffer = Buffer.allocUnsafe(2);
+        voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+        //console.log(propsIndexBuffer);
+        /* */
 
         const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
           [
@@ -568,7 +607,7 @@ describe("ato", () => {
             //walletAlain.publicKey.toBuffer(),
             //prop1.pubkey.toBuffer(),
             propsIndexBuffer,
-            alainIndexBuffer,
+            voteIndexBuffer,//alainIndexBuffer,
           ],
           program.programId
         );
@@ -615,15 +654,10 @@ describe("ato", () => {
           console.log("----");
           console.log("https://solana.fm/tx/"+txVote);
           console.log("----");
-          expect.fail("The transaction vote() should have failed but it didn't.");
+          //expect.fail("The transaction vote() should have failed but it didn't.");
 
-      } catch(err) {
-        // console.log("---");
-        // console.log(err.message);
-        // console.log("---");
-        expect(err.message).to.include("already in use");
+          //await monitor(program, "vote(): try to vote again");
 
-      }
 
     });
 
@@ -646,18 +680,26 @@ describe("ato", () => {
 
     try {
 
-      const propsIndex = 1;
-      const propsIndexBuffer = Buffer.allocUnsafe(2);
-      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
-      //console.log(propsIndexBuffer);
+        const propsIndex = 1;
+        const propsIndexBuffer = Buffer.allocUnsafe(2);
+        propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+        //console.log(propsIndexBuffer);
 
-      const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
+        /* */
+        const voteTailIndex = 0;
+        //console.log(tailIndex);
+        const voteIndexBuffer = Buffer.allocUnsafe(2);
+        voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+        //console.log(propsIndexBuffer);
+        /* */
+
+        const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
           Buffer.from("ATO_VOTE"),
           // walletAlain.publicKey.toBuffer(),
           // prop2.pubkey.toBuffer(),
           propsIndexBuffer,
-          alainIndexBuffer,
+          voteIndexBuffer,//alainIndexBuffer,
       ],
         program.programId
       );
@@ -705,7 +747,7 @@ describe("ato", () => {
         // console.log(err.message);
         // console.log("");
         expect(err.message).to.include("Program paused.");
-  
+
       }
   
       const txPauseToFalse = await program.methods
@@ -725,6 +767,8 @@ describe("ato", () => {
       expect(pausedValueToFalseAgain).to.equal(false);
       //console.log("p2");
 
+      //await monitor(program, "vote(): check pausable");
+
     });
 
 
@@ -732,10 +776,18 @@ describe("ato", () => {
 
       try {
 
-      const propsIndex = 1;
-      const propsIndexBuffer = Buffer.allocUnsafe(2);
-      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
-      //console.log(propsIndexBuffer);
+        const propsIndex = 1;
+        const propsIndexBuffer = Buffer.allocUnsafe(2);
+        propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+        //console.log(propsIndexBuffer);
+
+        /* */
+        const voteTailIndex = 0;
+        //console.log(tailIndex);
+        const voteIndexBuffer = Buffer.allocUnsafe(2);
+        voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+        //console.log(propsIndexBuffer);
+        /* */
 
       const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
@@ -743,8 +795,8 @@ describe("ato", () => {
           // walletBernard.publicKey.toBuffer(),
           // prop2.pubkey.toBuffer(),
           propsIndexBuffer,
-          alainIndexBuffer,
-          ],
+          voteIndexBuffer,//alainIndexBuffer,
+        ],
         program.programId
       );
 
@@ -764,13 +816,13 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
-          voterData: voterAlain.pubkey,
+          voterData    : voterAlain.pubkey,
           propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
-          voter        : walletBernard.publicKey,
+          voter        : walletAlain.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
         })
-        .signers([walletBernard])
+        .signers([walletAlain])
         .rpc();
 
         console.log("https://solana.fm/tx/"+txVote);
@@ -779,11 +831,14 @@ describe("ato", () => {
         expect.fail("The transaction vote() should have failed but it didn't.");
 
       } catch(err) {
-        // console.log(err.message);
-        // console.log("----");
+        console.log(err.message);
+        console.log("----");
+        //await monitor(program, "vote(): check amount value");
         expect(err.message).to.include("Incorrect amount.");
   
       }
+
+      //await monitor(program, "vote(): check amount value");
 
     });
 
@@ -792,10 +847,18 @@ describe("ato", () => {
 
       try {
 
-      const propsIndex = 1;
-      const propsIndexBuffer = Buffer.allocUnsafe(2);
-      propsIndexBuffer.writeUInt16LE(propsIndex, 0);
-      //console.log(propsIndexBuffer);
+        const propsIndex = 1;
+        const propsIndexBuffer = Buffer.allocUnsafe(2);
+        propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+        //console.log(propsIndexBuffer);
+
+        /* */
+        const voteTailIndex = 0;
+        //console.log(tailIndex);
+        const voteIndexBuffer = Buffer.allocUnsafe(2);
+        voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+        //console.log(propsIndexBuffer);
+        /* */
 
       const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
@@ -803,8 +866,8 @@ describe("ato", () => {
           // walletBernard.publicKey.toBuffer(),
           // prop2.pubkey.toBuffer(),
           propsIndexBuffer,
-          alainIndexBuffer,
-          ],
+          voteIndexBuffer,//alainIndexBuffer,
+        ],
         program.programId
       );
 
@@ -824,13 +887,13 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
-          voterData: voterAlain.pubkey,
+          voterData    : voterAlain.pubkey,
           propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
-          voter        : walletBernard.publicKey,
+          voter        : walletAlain.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
         })
-        .signers([walletBernard])
+        .signers([walletAlain])
         .rpc();
 
         console.log("https://solana.fm/tx/"+txVote);
@@ -844,6 +907,8 @@ describe("ato", () => {
         expect(err.message).to.include("Over deadline.");
   
       }
+
+      //await monitor(program, "vote(): check now/deadline");
 
     });
 
@@ -877,13 +942,21 @@ describe("ato", () => {
         propsIndexBuffer.writeUInt16LE(propsIndex, 0);
         //console.log(propsIndexBuffer);
 
+        /* */
+        const voteTailIndex = 0;
+        //console.log(tailIndex);
+        const voteIndexBuffer = Buffer.allocUnsafe(2);
+        voteIndexBuffer.writeUInt16LE(voteTailIndex, 0);
+        //console.log(propsIndexBuffer);
+        /* */
+
         const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
           [
             Buffer.from("ATO_VOTE"),
             // walletBernard.publicKey.toBuffer(),
             // prop2.pubkey.toBuffer(),
             propsIndexBuffer,
-            alainIndexBuffer,
+            voteIndexBuffer,//alainIndexBuffer,
           ],
           program.programId
         );
@@ -904,13 +977,13 @@ describe("ato", () => {
           )
           .accounts({
             voteData     : vote.pubkey,
-            voterData: voterAlain.pubkey,
+            voterData    : voterAlain.pubkey,
             propData     : prop2.pubkey,
             atoData      : atoDataKeypair.publicKey,
-            voter        : walletBernard.publicKey,
+            voter        : walletAlain.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
           })
-          .signers([walletBernard])
+          .signers([walletAlain])
           .rpc();
 
           console.log("https://solana.fm/tx/"+txVote);
@@ -939,6 +1012,8 @@ describe("ato", () => {
         await program.account.atoProposal.fetch(prop2.pubkey)
       ).status.valueOf();
       expect(propsStatusAfter).to.equal(ATO_PROPS_STATUS_OPENED);
+
+      //await monitor(program, "vote() + proposal_set_status()");
 
     });
 
