@@ -9,13 +9,13 @@ pub fn call(
 	ctx   : Context<Vote>,
 	vote  : bool,
 	amount: u64,
-	now   : u64
+	now   : u64,
 ) -> Result<()> {
 	pausable!(ctx);
 	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 	let vote_data: &mut Account<AtoVote>      = &mut ctx.accounts.vote_data;
-	//let voter_data: &mut Account<AtoVoter>      = &mut ctx.accounts.voter_data;
+	let voter_data: &mut Account<AtoVoter>      = &mut ctx.accounts.voter_data;
 // debug purpose
 {
 	msg!("pausable      {:?}", ato_data.paused);
@@ -39,6 +39,12 @@ pub fn call(
 	vote_data.amount    = amount;
 	vote_data.timestamp = now;
 	vote_data.vote      = vote;
+	// debug purpose
+	vote_data.leet1          = 4916;
+	vote_data.leet2          = 4919;
+	vote_data.proposal_index = prop_data.index;
+	vote_data.voter_index    = voter_data.index;
+	// debug purpose
 
 	match vote {
 		true  => { prop_data.vote_yes +=1;},
@@ -47,7 +53,7 @@ pub fn call(
 
 	prop_data.amount           += amount;
 	// set l'index dans struct AtoVoter à venir...
-	prop_data.voter_index_tail += 1;
+	prop_data.vote_index_tail += 1;
 
 // debug purpose
 	// msg!("{}", prop_data.vote_yes);

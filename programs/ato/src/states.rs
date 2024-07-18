@@ -14,6 +14,8 @@ pub struct AtoData {
 	pub scheduler          : Pubkey,
 	pub proposal_index_head: u16,
 	pub proposal_index_tail: u16,
+	pub voter_index_head   : u16,
+	pub voter_index_tail   : u16,
 	pub status             : u8,
 	pub paused             : bool,
 }
@@ -81,8 +83,9 @@ pub struct AtoProposal {
 	pub amount          : u64,
 	pub vote_yes        : u16,
 	pub vote_no         : u16,
-	pub voter_index_head: u16,
-	pub voter_index_tail: u16,
+	pub vote_index_head: u16,
+	pub vote_index_tail: u16,
+	pub index           : u16,
 	pub title           : [u8; STR_SIZE_TITLE],
 	pub description     : [u8; STR_SIZE_DESCR],
 	pub mode            : u8,
@@ -127,7 +130,12 @@ pub struct AtoVote {
 	pub voter         : Pubkey,
 	pub amount        : u64,
 	pub timestamp     : u64,
-	//pub proposal_index: u16,
+	// dedug purpose
+	pub leet1: u16,
+	pub proposal_index: u16,
+	pub voter_index: u16,
+	pub leet2: u16,
+	// dedug purpose
 	pub vote          : bool,
 	// false = no
 	// true  = yes
@@ -137,20 +145,27 @@ pub struct AtoVote {
 
 
 #[derive(Accounts)]
+//#[instruction(index_voter: u16, index_prop: u16)]
 pub struct Vote<'info> {
 
 	#[account(
 		init,
 		seeds = [
 			ATO_LABEL_VOTE.as_ref(),
-			voter.key().as_ref(),
-			prop_data.key().as_ref(),
+			//voter.key().as_ref(),
+			//prop_data.key().as_ref(),
+			prop_data.index.to_le_bytes().as_ref(),
+			voter_data.index.to_le_bytes().as_ref(),
+
 		],
 		bump,
-		payer = voter ,
+		payer = voter,
 		space = size_of::<AtoVote>() + 8 ,
 	)]
 	pub vote_data: Account<'info, AtoVote>,
+
+	#[account(mut)]
+	pub voter_data: Account<'info, AtoVoter>,
 
 	#[account(mut)]
 	pub prop_data: Account<'info, AtoProposal>,
@@ -195,7 +210,7 @@ pub struct ProposalSetStatus<'info> {
 #[derive(InitSpace)]
 pub struct AtoVoter {
 	pub voter: Pubkey,
-	pub index: u64,
+	pub index: u16,
 	pub name : [u8; STR_SIZE_NAME],
 	pub email: [u8; STR_SIZE_EMAIL],
 }

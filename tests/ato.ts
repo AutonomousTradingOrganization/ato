@@ -49,9 +49,12 @@ describe("ato", () => {
   const walletScheduler = anchor.web3.Keypair.generate();
 
   let walletAlain  : anchor.web3.Signer;
+  let voterAlain: { pubkey: any; bump?: number; };
+  let alainIndexBuffer: Buffer;
+  
   let walletBernard: anchor.web3.Signer;
   let walletCeline:  anchor.web3.Signer;
-
+  
   const ATO_STATUS_NOT_READY  = 0;
   const ATO_STATUS_READY      = 1;
   const PUBLICKEY_DEFAULT_STR = "11111111111111111111111111111111";
@@ -459,7 +462,7 @@ describe("ato", () => {
       program.programId
     );
     
-    let voterAlain = {
+    voterAlain = {
       pubkey: alainPubkey,
       bump  : alainBump,
     };
@@ -488,13 +491,20 @@ describe("ato", () => {
     const propsIndex = 0;
     const propsIndexBuffer = Buffer.allocUnsafe(2);
     propsIndexBuffer.writeUInt16LE(propsIndex, 0);
-    //console.log(propsIndexBuffer);
+    //console.log("prop #1 "+propsIndexBuffer);
+
+    const alainIndex = 0;
+    alainIndexBuffer = Buffer.allocUnsafe(2);
+    alainIndexBuffer.writeUInt16LE(alainIndex, 0);
+    //console.log("alain "+alainIndexBuffer);
 
     const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
       [
         Buffer.from("ATO_VOTE"),
-        walletAlain.publicKey.toBuffer(),
-        prop1.pubkey.toBuffer(),
+        //walletAlain.publicKey.toBuffer(),
+        //prop1.pubkey.toBuffer(),
+        propsIndexBuffer,
+        alainIndexBuffer,
       ],
       program.programId
     );
@@ -529,6 +539,7 @@ describe("ato", () => {
       )
       .accounts({
         voteData     : vote.pubkey,
+        voterData: voterAlain.pubkey,
         propData     : prop1.pubkey,
         atoData      : atoDataKeypair.publicKey,
         voter        : walletAlain.publicKey,
@@ -554,8 +565,10 @@ describe("ato", () => {
         const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
           [
             Buffer.from("ATO_VOTE"),
-            walletAlain.publicKey.toBuffer(),
-            prop1.pubkey.toBuffer(),
+            //walletAlain.publicKey.toBuffer(),
+            //prop1.pubkey.toBuffer(),
+            propsIndexBuffer,
+            alainIndexBuffer,
           ],
           program.programId
         );
@@ -590,6 +603,7 @@ describe("ato", () => {
           )
           .accounts({
             voteData     : vote.pubkey,
+            voterData    : voterAlain.pubkey,
             propData     : prop1.pubkey,
             atoData      : atoDataKeypair.publicKey,
             voter        : walletAlain.publicKey,
@@ -640,9 +654,11 @@ describe("ato", () => {
       const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
           Buffer.from("ATO_VOTE"),
-          walletAlain.publicKey.toBuffer(),
-          prop2.pubkey.toBuffer(),
-        ],
+          // walletAlain.publicKey.toBuffer(),
+          // prop2.pubkey.toBuffer(),
+          propsIndexBuffer,
+          alainIndexBuffer,
+      ],
         program.programId
       );
 
@@ -671,6 +687,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
+          voterData    : voterAlain.pubkey,
           propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletAlain.publicKey,
@@ -723,9 +740,11 @@ describe("ato", () => {
       const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
           Buffer.from("ATO_VOTE"),
-          walletBernard.publicKey.toBuffer(),
-          prop2.pubkey.toBuffer(),
-        ],
+          // walletBernard.publicKey.toBuffer(),
+          // prop2.pubkey.toBuffer(),
+          propsIndexBuffer,
+          alainIndexBuffer,
+          ],
         program.programId
       );
 
@@ -745,6 +764,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
+          voterData: voterAlain.pubkey,
           propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletBernard.publicKey,
@@ -780,9 +800,11 @@ describe("ato", () => {
       const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
         [
           Buffer.from("ATO_VOTE"),
-          walletBernard.publicKey.toBuffer(),
-          prop2.pubkey.toBuffer(),
-        ],
+          // walletBernard.publicKey.toBuffer(),
+          // prop2.pubkey.toBuffer(),
+          propsIndexBuffer,
+          alainIndexBuffer,
+          ],
         program.programId
       );
 
@@ -802,6 +824,7 @@ describe("ato", () => {
         )
         .accounts({
           voteData     : vote.pubkey,
+          voterData: voterAlain.pubkey,
           propData     : prop2.pubkey,
           atoData      : atoDataKeypair.publicKey,
           voter        : walletBernard.publicKey,
@@ -857,8 +880,10 @@ describe("ato", () => {
         const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
           [
             Buffer.from("ATO_VOTE"),
-            walletBernard.publicKey.toBuffer(),
-            prop2.pubkey.toBuffer(),
+            // walletBernard.publicKey.toBuffer(),
+            // prop2.pubkey.toBuffer(),
+            propsIndexBuffer,
+            alainIndexBuffer,
           ],
           program.programId
         );
@@ -879,6 +904,7 @@ describe("ato", () => {
           )
           .accounts({
             voteData     : vote.pubkey,
+            voterData: voterAlain.pubkey,
             propData     : prop2.pubkey,
             atoData      : atoDataKeypair.publicKey,
             voter        : walletBernard.publicKey,

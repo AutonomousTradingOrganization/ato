@@ -51,8 +51,8 @@ pub fn call(
 	prop_data.amount           = 0;
 	prop_data.vote_yes         = 0; // 0 YES
 	prop_data.vote_no          = 0; // 0 NO
-	prop_data.voter_index_head = 0;
-	prop_data.voter_index_tail = 0;
+	prop_data.vote_index_head = 0;
+	prop_data.vote_index_tail = 0;
 	string_to_u8!(title, prop_data.title);
 	string_to_u8!(description, prop_data.description);
 	prop_data.status    = AtoProposalStatus::Opened as u8;
@@ -65,6 +65,8 @@ pub fn call(
 // debug purpose
 
 	// one more proposal pending...
+	prop_data.index = ato_data.proposal_index_tail;
+	msg!("proposal {} / {}", title, prop_data.index);
 	ato_data.proposal_index_tail += 1;
 
 	Ok(())
