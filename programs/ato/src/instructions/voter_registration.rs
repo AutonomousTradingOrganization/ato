@@ -15,7 +15,7 @@ pub fn call(
 	let voter_data: &mut Account<AtoVoter> = &mut ctx.accounts.voter_data;
 	let ato_data: &mut  Account<AtoData>   = &mut ctx.accounts.ato_data;
 
-	require_gte!(STR_SIZE_NAME,  name.len(),  AtoError::IncorrectNameLenght);
+	require_gte!(STR_SIZE_NAME,  name.len(), AtoError::IncorrectNameLenght);
 	string_to_u8!(name, voter_data.name);
 
 	require_gte!(STR_SIZE_EMAIL, email.len(), AtoError::IncorrectEmailLenght);

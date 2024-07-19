@@ -655,10 +655,8 @@ describe("ato", () => {
     const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
       [
         Buffer.from("ATO_VOTE"),
-        //walletAlain.publicKey.toBuffer(),
-        //prop1.pubkey.toBuffer(),
         propsIndexBuffer,
-        voteIndexBuffer,  //alainIndexBuffer,
+        voteIndexBuffer,
       ],
       program.programId
     );

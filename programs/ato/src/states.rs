@@ -65,7 +65,6 @@ pub struct SetPause<'info> {
 
 	#[account(
 		mut,
-		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -114,7 +113,6 @@ pub struct ProposalCreate<'info> {
 	
 	#[account(
 		mut,
-		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -130,11 +128,9 @@ pub struct AtoVote {
 	pub amount        : u64,
 	pub timestamp     : u64,
 	
-	//-pub leet1: u16,	// dedug purpose
 	pub proposal_index: u16,
 	pub voter_index:    u16,
 	pub vote_index:     u16,
-	//-pub leet2: u16,// dedug purpose
 
 	pub vote          : bool,
 	// false = no
@@ -152,12 +148,8 @@ pub struct Vote<'info> {
 		init,
 		seeds = [
 			ATO_LABEL_VOTE.as_ref(),
-			//voter.key().as_ref(),
-			//prop_data.key().as_ref(),
 			prop_data.index.to_le_bytes().as_ref(),
 			prop_data.vote_index_tail.to_le_bytes().as_ref(),
-			//voter_data.index.to_le_bytes().as_ref(),
-
 		],
 		bump,
 		payer = voter,
@@ -227,7 +219,7 @@ pub struct VoterAdd<'info> {
 			voter.key().as_ref(),
 		],
 		bump,
-		payer = voter ,
+		payer = voter,
 		space = size_of::<AtoVoter>() + 8 ,
 	)]
 	pub voter_data: Account<'info, AtoVoter>,

@@ -12,10 +12,10 @@ pub fn call(
 	now   : u64,
 ) -> Result<()> {
 	pausable!(ctx);
-	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
+	let ato_data: &mut Account<AtoData>      = &mut ctx.accounts.ato_data;
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-	let vote_data: &mut Account<AtoVote>      = &mut ctx.accounts.vote_data;
-	let voter_data: &mut Account<AtoVoter>      = &mut ctx.accounts.voter_data;
+	let vote_data: &mut Account<AtoVote>     = &mut ctx.accounts.vote_data;
+	let voter_data: &mut Account<AtoVoter>   = &mut ctx.accounts.voter_data;
 
 	// debug purpose
 	// {
