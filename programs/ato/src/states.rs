@@ -8,13 +8,13 @@ use crate::constants;
 pub use constants::*;
 
 #[account]
-#[derive(InitSpace)]
+//#[derive(InitSpace)]
 pub struct AtoData {
 	pub admin              : Pubkey,
 	pub scheduler          : Pubkey,
 	pub proposal_index_head: u16,
 	pub proposal_index_tail: u16,
-	pub voter_index_head   : u16,
+	//pub voter_index_head   : u16,
 	pub voter_index_tail   : u16,
 	pub status             : u8,
 	pub paused             : bool,
@@ -77,19 +77,18 @@ pub struct SetPause<'info> {
 #[account]
 #[derive(InitSpace)]
 pub struct AtoProposal {
-	pub signer          : Pubkey,
-	pub deadline        : u64,
-	pub threshold       : u64,
-	pub amount          : u64,
-	pub vote_yes        : u16,
-	pub vote_no         : u16,
-	pub vote_index_head: u16,
+	pub signer         : Pubkey,
+	pub deadline       : u64,
+	pub threshold      : u64,
+	pub amount         : u64,
+	pub vote_yes       : u16,
+	pub vote_no        : u16,
 	pub vote_index_tail: u16,
-	pub index           : u16,
-	pub title           : [u8; STR_SIZE_TITLE],
-	pub description     : [u8; STR_SIZE_DESCR],
-	pub mode            : u8,
-	pub status          : u8,
+	pub index          : u16,
+	pub title          : [u8; STR_SIZE_TITLE],
+	pub description    : [u8; STR_SIZE_DESCR],
+	pub mode           : u8,
+	pub status         : u8,
 }
 
 #[derive(Accounts)]

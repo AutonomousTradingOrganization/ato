@@ -14,22 +14,22 @@ pub fn call(
 	deadline   : u64,
 ) -> Result<()> {
 
-// {
-// 	msg!("{}", line!());
-// 	msg!("{}", title);
-// 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-// 	msg!("{:?}", prop_data.key());
-// }
+	// {
+	// 	msg!("{}", line!());
+	// 	msg!("{}", title);
+	// 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
+	// 	msg!("{:?}", prop_data.key());
+	// }
 
-// debug purpose
-// {
-// 	// let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-// 	msg!("{:?}", title);
-// 	msg!("{:?}", mode);
-// 	msg!("{:?}", title.len());
-// 	msg!("{:?}", deadline);
-// }
-// debug purpose
+	// debug purpose
+	// {
+	// 	// let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
+	// 	msg!("{:?}", title);
+	// 	msg!("{:?}", mode);
+	// 	msg!("{:?}", title.len());
+	// 	msg!("{:?}", deadline);
+	// }
+	// debug purpose
 
 	// sanity checks !
 	admin_only!(ctx);
@@ -41,32 +41,33 @@ pub fn call(
 	require_gte!(DEADLINE_MAX, deadline,            AtoError::TooBigDeadline);
 	//-msg!("{}", line!());
 
-	let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
+	let ato_data: &mut Account<AtoData>      = &mut ctx.accounts.ato_data;
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 
-	prop_data.signer           = ctx.accounts.signer.key();
-	prop_data.deadline         = deadline;
-	prop_data.mode             = mode;
-	prop_data.threshold        = threshold;
-	prop_data.amount           = 0;
-	prop_data.vote_yes         = 0; // 0 YES
-	prop_data.vote_no          = 0; // 0 NO
-	prop_data.vote_index_head = 0;
+	prop_data.signer          = ctx.accounts.signer.key();
+	prop_data.deadline        = deadline;
+	prop_data.mode            = mode;
+	prop_data.threshold       = threshold;
+	prop_data.amount          = 0;
+	prop_data.vote_yes        = 0; // 0 YES
+	prop_data.vote_no         = 0; // 0 NO
 	prop_data.vote_index_tail = 0;
 	string_to_u8!(title, prop_data.title);
 	string_to_u8!(description, prop_data.description);
 	prop_data.status    = AtoProposalStatus::Opened as u8;
 
-// debug purpose
+	// debug purpose
 	// msg!("{:?}", prop_data.title);
 	// msg!("{:?}", prop_data.description);
 	// msg!("{:?}", prop_data.mode);
 	// msg!("{:?}", prop_data.deadline);
-// debug purpose
+	// debug purpose
 
 	// one more proposal pending...
 	prop_data.index = ato_data.proposal_index_tail;
-	msg!("proposal {} / {}", title, prop_data.index);	// debug purpose
+	// debug purpose
+	//msg!("proposal {} / {}", title, prop_data.index);	// debug purpose
+	// debug purpose
 	ato_data.proposal_index_tail += 1;
 
 	Ok(())

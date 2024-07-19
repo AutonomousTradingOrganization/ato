@@ -16,18 +16,19 @@ pub fn call(
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 	let vote_data: &mut Account<AtoVote>      = &mut ctx.accounts.vote_data;
 	let voter_data: &mut Account<AtoVoter>      = &mut ctx.accounts.voter_data;
-// debug purpose
-{
-	msg!("pausable      {:?}", ato_data.paused);
-	msg!("ato status    {:?}", ato_data.status);
-	//msg!("head index    {:?}", ato_data.proposal_index_head);
-	//msg!("tail index    {:?}", ato_data.proposal_index_tail);
-	msg!("props status  {:?}", prop_data.status);
-	msg!("amount        {:?}", amount);
-	msg!("now           {:?}", now);
-	msg!("deadline      {:?}", prop_data.deadline);
-}
-// debug purpose
+
+	// debug purpose
+	// {
+	// 	msg!("pausable      {:?}", ato_data.paused);
+	// 	msg!("ato status    {:?}", ato_data.status);
+	// 	msg!("head index    {:?}", ato_data.proposal_index_head);
+	// 	msg!("tail index    {:?}", ato_data.proposal_index_tail);
+	// 	msg!("props status  {:?}", prop_data.status);
+	// 	msg!("amount        {:?}", amount);
+	// 	msg!("now           {:?}", now);
+	// 	msg!("deadline      {:?}", prop_data.deadline);
+	// }
+	// debug purpose
 
 	require_eq!(ato_data.status, AtoStatus::Ready as u8, AtoError::IncorrectProposalStatus);
 	require_eq!(prop_data.status, AtoProposalStatus::Opened as u8, AtoError::IncorrectProposalStatus);
@@ -48,9 +49,9 @@ pub fn call(
 	prop_data.vote_index_tail += 1;
 
 	// debug purpose
-	msg!("{}", vote_data.proposal_index);
-	msg!("{}", vote_data.voter_index);
-	msg!("{}", vote_data.vote_index);
+	// msg!("{}", vote_data.proposal_index);
+	// msg!("{}", vote_data.voter_index);
+	// msg!("{}", vote_data.vote_index);
 	// debug purpose
 
 	match vote {

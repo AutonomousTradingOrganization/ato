@@ -12,6 +12,7 @@ pub fn call(ctx: Context<Initialize>) -> Result<()> {
 	ato_data.scheduler           = Pubkey::default();
 	ato_data.proposal_index_head = 0;
 	ato_data.proposal_index_tail = 0;
+	ato_data.voter_index_tail    = 0;
 	ato_data.status              = AtoStatus::NotReady as u8;
 	ato_data.paused              = false;
 

@@ -54,8 +54,98 @@ async function monitor( program, comment) {
   let allVote = await program.account.atoVote.all();
   console.log("vote "); console.log(allVote);
   console.log("");
+  //console.log("amount: ", allVote[1].account.amount);
+}
+
+async function showVoter( program: anchor.Program<Ato>, accounts: any[], indexArray: string | number) {
+  const allVoter = await program.account.atoVoter.all();
+  console.log("----------------");
+
+  //console.log(allVoter[indexArray]);
+
+  const index   = allVoter[indexArray].account.index;
+  const name    = String.fromCharCode(...allVoter[indexArray].account.name.filter(charCode => charCode !== 0));
+  const key     = allVoter[indexArray].account.voter;
+  const balance = await anchor.getProvider().connection.getBalance(key);
+
+  console.log("voter   # "+index);
+  console.log("name    : "+name);
+  console.log("pubkey  : "+key);
+  console.log("balance : "+balance / anchor.web3.LAMPORTS_PER_SOL);
+
+  console.log("----------------");
+  console.log("");
 
 }
+
+
+async function showAllVoters( program: anchor.Program<Ato>, accounts: any[], atoDataKeypair: anchor.web3.Keypair) {
+  const voterIndexTail = (
+    await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).voterIndexTail.valueOf();
+  console.log("================");
+  console.log(voterIndexTail+" voters");
+
+  for(let i=0; i<voterIndexTail; i++) {
+    await showVoter(program, accounts, i);
+  }
+  console.log("");
+
+}
+
+async function showProposal( program, indexArray) {
+  const allProp = await program.account.atoProposal.all();
+  console.log("----------------");
+
+  //console.log(allProp[indexArray]);
+
+  const index     = allProp[indexArray].account.index;
+  const title     = String.fromCharCode(...allProp[indexArray].account.title.filter(charCode => charCode !== 0));
+  const key       = allProp[indexArray].account.voter;
+  const amount    = allProp[indexArray].account.amount;
+  const threshold = allProp[indexArray].account.threshold;
+  const deadline  = allProp[indexArray].account.deadline;
+  const voteYes   = allProp[indexArray].account.voteYes;
+  const voteNo    = allProp[indexArray].account.voteNo;
+
+  console.log("proposal  # "+index);
+  console.log("title     # "+title);
+  console.log("pubkey    # "+key);
+  console.log("pubkey    # "+amount);
+  console.log("threshold # "+threshold);
+  console.log("deadline  # "+deadline);
+  console.log("yes       # "+voteYes);
+  console.log("no        # "+voteNo);
+  console.log("amount    # "+amount);
+
+  console.log("----------------");
+  console.log("");
+
+}
+
+async function showAllProposals( program, atoDataKeypair: anchor.web3.Keypair) {
+
+  console.log("================");
+
+  const proposalIndexHead = (
+    await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).proposalIndexHead.valueOf();
+  //-console.log("prop  idx head : " + proposalIndexHead);
+
+  const proposalIndexTail = (
+    await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).proposalIndexTail.valueOf();
+  //-console.log("prop  idx tail : " + proposalIndexTail);
+  console.log("proposals : " + proposalIndexHead+" - " + (proposalIndexTail-1));
+
+  for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
+    await showProposal(program, i);
+  }
+
+  console.log("");
+}
+
+
 
 describe("ato", () => {
   // Configure the client to use the local cluster.
@@ -69,12 +159,19 @@ describe("ato", () => {
   const walletIimposter = anchor.web3.Keypair.generate();
   const walletScheduler = anchor.web3.Keypair.generate();
 
-  let walletAlain  : anchor.web3.Signer;
-  let voterAlain: { pubkey: any; bump?: number; };
+  let accounts: any[];
+  
+  let walletAlain     : anchor.web3.Signer;
+  let voterAlain      : { pubkey: any; bump?: number; };
   let alainIndexBuffer: Buffer;
   
-  let walletBernard: anchor.web3.Signer;
-  let walletCeline:  anchor.web3.Signer;
+  let walletBernard     : anchor.web3.Signer;
+  let voterBernard      : { pubkey: any; bump?: number; };
+  let bernardIndexBuffer: Buffer;
+  
+  let walletCeline     : anchor.web3.Signer;
+  let voterCeline      : { pubkey: any; bump?: number; };
+  let celineIndexBuffer: Buffer;
   
   const ATO_STATUS_NOT_READY  = 0;
   const ATO_STATUS_READY      = 1;
@@ -106,8 +203,7 @@ describe("ato", () => {
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .signers([atoDataKeypair])
+      }).signers([atoDataKeypair])
       .rpc();
 
 
@@ -132,15 +228,9 @@ describe("ato", () => {
     expect(getStatus).to.equal(ATO_STATUS_NOT_READY);
 
 
-    const getIndexHead = (
-      await program.account.atoData.fetch(atoDataKeypair.publicKey)
-    ).status.valueOf();
-
-    expect(getIndexHead).to.equal(0);
-
     const getIndexTail = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
-    ).status.valueOf();
+    ).voterIndexTail.valueOf();
   
     expect(getIndexTail).to.equal(0);
   
@@ -181,8 +271,7 @@ describe("ato", () => {
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .rpc();
+      }).rpc();
 
     const pausedValueToTrue = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
@@ -196,8 +285,7 @@ describe("ato", () => {
       atoData      : atoDataKeypair.publicKey,
       signer       : provider.wallet.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
-    })
-    .rpc();
+    }).rpc();
 
     const pausedValueToFalseAgain = (
       await program.account.atoData.fetch(atoDataKeypair.publicKey)
@@ -216,8 +304,7 @@ describe("ato", () => {
         atoData      : atoDataKeypair.publicKey,
         signer       : walletIimposter.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .signers([walletIimposter])
+      }).signers([walletIimposter])
       .rpc();
 
       expect.fail("The transaction setPause() should have failed but it didn't.");
@@ -465,14 +552,17 @@ describe("ato", () => {
 
 
   it("voter_registration(): do it...", async () => {
-    const accounts = await createAccounts(5, 2);
+    accounts = await createAccounts(5, 2);
 
     walletAlain   = accounts[0];
     walletBernard = accounts[1];
     walletCeline  = accounts[2];
 
-    const name  = "Alain Alain";
-    const email = "alain@gmail.com";
+    let name : string;
+    let email: string;
+
+    name  = "Alain Alain";
+    email = "alain@gmail.com";
 
     // Calculer l'adresse de la PDA
     const [alainPubkey, alainBump] = await anchor.web3.PublicKey.findProgramAddress(
@@ -499,6 +589,40 @@ describe("ato", () => {
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .signers([walletAlain])
+      .rpc();
+
+    console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
+    //console.log("");
+
+
+    name  = "Bernard Bernard";
+    email = "bernard@gmail.com";
+
+    // Calculer l'adresse de la PDA
+    const [bernardPubkey, bernardBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from("ATO_VOTER"),
+        walletBernard.publicKey.toBuffer(),
+      ],
+      program.programId
+    );
+
+    voterBernard = {
+      pubkey: bernardPubkey,
+      bump  : bernardBump,
+    };
+
+    txVoterReg = await program.methods
+      .voterRegistration(
+        name,
+        email,
+      ).accounts({
+        voterData    : voterBernard.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        voter        : walletBernard.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([walletBernard])
       .rpc();
 
     console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
@@ -651,9 +775,8 @@ describe("ato", () => {
           .signers([walletAlain])
           .rpc();
 
-          console.log("----");
           console.log("https://solana.fm/tx/"+txVote);
-          console.log("----");
+          console.log("");
           //expect.fail("The transaction vote() should have failed but it didn't.");
 
           //await monitor(program, "vote(): try to vote again");
@@ -808,13 +931,11 @@ describe("ato", () => {
       const amount = 20;
       const now    = 30;
 
-      let txVote = await program.methods
-        .vote(
+      let txVote = await program.methods.vote(
           true,
           new anchor.BN(amount),  // amount (Lamports >= MIN)
           new anchor.BN(now)      // now (s < proposal deadline)
-        )
-        .accounts({
+        ).accounts({
           voteData     : vote.pubkey,
           voterData    : voterAlain.pubkey,
           propData     : prop2.pubkey,
@@ -831,8 +952,8 @@ describe("ato", () => {
         expect.fail("The transaction vote() should have failed but it didn't.");
 
       } catch(err) {
-        console.log(err.message);
-        console.log("----");
+        //console.log(err.message);
+        //console.log("----");
         //await monitor(program, "vote(): check amount value");
         expect(err.message).to.include("Incorrect amount.");
   
@@ -884,8 +1005,7 @@ describe("ato", () => {
           true,
           new anchor.BN(amount),  // amount (Lamports >= MIN)
           new anchor.BN(now)      // now (s < proposal deadline)
-        )
-        .accounts({
+        ).accounts({
           voteData     : vote.pubkey,
           voterData    : voterAlain.pubkey,
           propData     : prop2.pubkey,
@@ -974,8 +1094,7 @@ describe("ato", () => {
             true,
             new anchor.BN(amount),  // amount (Lamports >= MIN)
             new anchor.BN(now)      // now (s < proposal deadline)
-          )
-          .accounts({
+          ).accounts({
             voteData     : vote.pubkey,
             voterData    : voterAlain.pubkey,
             propData     : prop2.pubkey,
@@ -1005,8 +1124,7 @@ describe("ato", () => {
         atoData      : atoDataKeypair.publicKey,
         signer       : provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .rpc();
+      }).rpc();
 
       const propsStatusAfter = (
         await program.account.atoProposal.fetch(prop2.pubkey)
@@ -1014,6 +1132,40 @@ describe("ato", () => {
       expect(propsStatusAfter).to.equal(ATO_PROPS_STATUS_OPENED);
 
       //await monitor(program, "vote() + proposal_set_status()");
+
+    });
+
+
+    it("Voting is closed !", async () => {
+
+      //await monitor(program, "Voting is closed !");
+
+      const proposalIndexHead = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).proposalIndexHead.valueOf();
+      console.log("prop  idx head : " + proposalIndexHead);
+
+      const proposalIndexTail = (
+        await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      ).proposalIndexTail.valueOf();
+      console.log("prop  idx tail : " + proposalIndexTail);
+
+      // const voterIndexTail = (
+      //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      // ).voterIndexTail.valueOf();
+      // console.log("voter idx tail : " + voterIndexTail);
+
+      let allVote = await program.account.atoVote.all();
+      let amount = allVote[1].account.amount;
+      console.log(amount);
+      let voteIndex = allVote[1].account.voteIndex;
+      console.log(voteIndex);
+      console.log("amount: ", allVote[1].account.amount);
+
+      await showAllVoters( program, accounts, atoDataKeypair);
+      await showAllProposals( program, atoDataKeypair);
+      // await showVoter(program, accounts, 0);
+      // await showVoter(program, accounts, 1);
 
     });
 
