@@ -200,9 +200,30 @@ async function showAllVotes( program, account, atoDataKeypair: anchor.web3.Keypa
     await showVote(program, account, i);
   }
   
-  
   console.log("");
 }
+
+
+
+async function getPubkeyFromProposal(provider, program: anchor.Program<Ato>, index: number, signer: anchor.web3.Signer) {
+  let propsIndexBuffer = Buffer.allocUnsafe(2);
+  propsIndexBuffer.writeUInt16LE(index, 0);
+
+  const seeds = [
+    Buffer.from("ATO_PROP"),
+    provider.wallet.publicKey.toBuffer(),
+    propsIndexBuffer,
+  ];
+  //console.log(seeds);
+
+  const [pubkey, _bump] = await anchor.web3.PublicKey.findProgramAddress(
+    seeds,
+    program.programId
+  );
+
+  return pubkey;
+}
+
 
 describe("scenario", () => {
   // Configure the client to use the local cluster.
@@ -346,6 +367,7 @@ describe("scenario", () => {
   let deadline    = 120;
 
   let tailIndex: number;
+  let props: { pubkey: any; bump?: number; };
   let seeds;
 
   tailIndex = (
@@ -359,22 +381,25 @@ describe("scenario", () => {
   //console.log(">")
   //console.log(propsIndexBuffer);
 
+  seeds = [
+    Buffer.from("ATO_PROP"),
+    provider.wallet.publicKey.toBuffer(),
+    propsIndexBuffer,
+  ];
+  console.log(seeds);
+
   // Calculer l'adresse de la PDA
   let [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
-    [
-      Buffer.from("ATO_PROP"),
-      provider.wallet.publicKey.toBuffer(),
-      propsIndexBuffer,
-    ],
+    seeds,
     program.programId
   );
 
-  seeds = {
+  props = {
     pubkey: propsPubkey,
     bump  : propsBump,
   };
-
-  seedsProp1 = seeds.pubkey;
+  
+  seedsProp1 = props.pubkey;
 
   let txProp = await program.methods
     .proposalCreate(
@@ -384,7 +409,7 @@ describe("scenario", () => {
       new anchor.BN(threshold),
       new anchor.BN(deadline)
     ).accounts({
-      propData     : seeds.pubkey,
+      propData     : props.pubkey,
       atoData      : atoDataKeypair.publicKey,
       signer       : provider.wallet.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
@@ -413,18 +438,20 @@ describe("scenario", () => {
   propsIndexBuffer.writeUInt16LE(tailIndex, 0);
   //console.log(">")
   //console.log(propsIndexBuffer);
-
-  // Calculer l'adresse de la PDA
-  [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
-    [
+  
+  seeds =     [
     Buffer.from("ATO_PROP"),
     provider.wallet.publicKey.toBuffer(),
     propsIndexBuffer,
-    ],
+  ];
+
+  // Calculer l'adresse de la PDA
+  [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
+    seeds,
     program.programId
   );
 
-  seeds = {
+  props = {
     pubkey: propsPubkey,
     bump  : propsBump,
   };
@@ -437,7 +464,7 @@ describe("scenario", () => {
       new anchor.BN(threshold),
       new anchor.BN(deadline)
     ).accounts({
-      propData     : seeds.pubkey,
+      propData     : props.pubkey,
       atoData      : atoDataKeypair.publicKey,
       signer       : provider.wallet.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
@@ -607,10 +634,6 @@ describe("scenario", () => {
     tailIndexBuffer.writeUInt16LE(tailIndex, 0);
     console.log(">> tail prop #1 ");
     console.log(propsIndexBuffer);
-
-    // tailIndex = (
-    //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
-    // ).proposalIndexTail.valueOf();
   
     propsIndexBuffer = Buffer.allocUnsafe(2);
     propsIndexBuffer.writeUInt16LE(tailIndex, 0);
@@ -631,6 +654,14 @@ describe("scenario", () => {
 
     const amount = 200000;
     const now = 19;
+    ///
+    console.log("sp1");
+    console.log(seedsProp1);
+    ///
+    const k = await getPubkeyFromProposal( provider, program, propsIndex, walletAlain);
+    console.log("k");
+    console.log(k);
+    ///
 
     let txVote = await program.methods
       .vote(
@@ -642,7 +673,6 @@ describe("scenario", () => {
         voteData     : seeds.pubkey,
         voterData    : voterAlain.pubkey,
         propData     : seedsProp1,
-        //propData     : prop1.pubkey,
         atoData      : atoDataKeypair.publicKey,
         voter        : walletAlain.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
