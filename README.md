@@ -34,9 +34,9 @@ npm 9.6.7
 ``` 
 
 `cargo build-sbf -V`
-``` 
+```
 solana-cargo-build-sbf 1.18.17
 platform-tools v1.41
 rustc 1.75.0
-``` 
+```
 

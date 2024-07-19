@@ -39,6 +39,7 @@ async function monitor( program, comment) {
 
   console.log("");
   console.log(comment);
+  
   let allAto = await program.account.atoData.all();
   console.log("root ");  console.log(allAto);
   console.log("");
@@ -109,14 +110,14 @@ async function showProposal( program, indexArray) {
   const voteNo    = allProp[indexArray].account.voteNo;
 
   console.log("proposal  # "+index);
-  console.log("title     # "+title);
-  console.log("pubkey    # "+key);
-  console.log("pubkey    # "+amount);
-  console.log("threshold # "+threshold);
-  console.log("deadline  # "+deadline);
-  console.log("yes       # "+voteYes);
-  console.log("no        # "+voteNo);
-  console.log("amount    # "+amount);
+  console.log("title     : "+title);
+  console.log("pubkey    : "+key);
+  console.log("amount    : "+amount / anchor.web3.LAMPORTS_PER_SOL);
+  console.log("threshold : "+threshold);
+  console.log("deadline  : "+deadline);
+  console.log("yes       : "+voteYes);
+  console.log("no        : "+voteNo);
+  console.log("amount    : "+amount);
 
   console.log("----------------");
   console.log("");
@@ -136,7 +137,7 @@ async function showAllProposals( program, atoDataKeypair: anchor.web3.Keypair) {
     await program.account.atoData.fetch(atoDataKeypair.publicKey)
   ).proposalIndexTail.valueOf();
   //-console.log("prop  idx tail : " + proposalIndexTail);
-  console.log("proposals : " + proposalIndexHead+" - " + (proposalIndexTail-1));
+  console.log("proposals : "+ (proposalIndexTail-proposalIndexHead) +" " + proposalIndexHead+" - " + (proposalIndexTail-1));
 
   for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
     await showProposal(program, i);
@@ -428,8 +429,8 @@ describe("ato", () => {
       //.signers([provider.wallet])
       .rpc();
 
-      console.log("(prop #1) https://solana.fm/tx/"+txProp1);
-      console.log("");
+      // console.log("(prop #1) https://solana.fm/tx/"+txProp1);
+      // console.log("");
 
   });
 
@@ -483,8 +484,8 @@ describe("ato", () => {
       //.signers([provider.wallet])
       .rpc();
 
-      console.log("(prop #2) https://solana.fm/tx/"+txProp2);
-      console.log("");
+      // console.log("(prop #2) https://solana.fm/tx/"+txProp2);
+      // console.log("");
 
   });
 
@@ -561,7 +562,7 @@ describe("ato", () => {
     let name : string;
     let email: string;
 
-    name  = "Alain Alain";
+    name  = "Alain";
     email = "alain@gmail.com";
 
     // Calculer l'adresse de la PDA
@@ -591,11 +592,11 @@ describe("ato", () => {
       .signers([walletAlain])
       .rpc();
 
-    console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
+    //console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
     //console.log("");
 
 
-    name  = "Bernard Bernard";
+    name  = "Bernard";
     email = "bernard@gmail.com";
 
     // Calculer l'adresse de la PDA
@@ -625,8 +626,8 @@ describe("ato", () => {
       .signers([walletBernard])
       .rpc();
 
-    console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
-    console.log("");
+    // console.log("(voter reg...) https://solana.fm/tx/"+txVoterReg);
+    // console.log("");
 
   });
 
@@ -701,8 +702,8 @@ describe("ato", () => {
       .signers([walletAlain])
       .rpc();
 
-      console.log("(Alain vote for prop #1) https://solana.fm/tx/"+txVote);
-      console.log("");
+      // console.log("(Alain vote for prop #1) https://solana.fm/tx/"+txVote);
+      // console.log("");
 
       //await monitor(program, "Alain vote for prop #1");
 
@@ -775,11 +776,10 @@ describe("ato", () => {
           .signers([walletAlain])
           .rpc();
 
-          console.log("https://solana.fm/tx/"+txVote);
-          console.log("");
-          //expect.fail("The transaction vote() should have failed but it didn't.");
+        // console.log("https://solana.fm/tx/"+txVote);
+        // console.log("");
 
-          //await monitor(program, "vote(): try to vote again");
+        //await monitor(program, "vote(): try to vote again");
 
 
     });
@@ -861,8 +861,8 @@ describe("ato", () => {
         .signers([walletAlain])
         .rpc();
 
-        console.log("https://solana.fm/tx/"+txVote);
-        console.log("");
+        // console.log("https://solana.fm/tx/"+txVote);
+        // console.log("");
 
         expect.fail("The transaction vote() should have failed but it didn't.");
 
@@ -946,8 +946,8 @@ describe("ato", () => {
         .signers([walletAlain])
         .rpc();
 
-        console.log("https://solana.fm/tx/"+txVote);
-        console.log("");
+        // console.log("https://solana.fm/tx/"+txVote);
+        // console.log("");
 
         expect.fail("The transaction vote() should have failed but it didn't.");
 
@@ -1016,8 +1016,8 @@ describe("ato", () => {
         .signers([walletAlain])
         .rpc();
 
-        console.log("https://solana.fm/tx/"+txVote);
-        console.log("");
+        // console.log("https://solana.fm/tx/"+txVote);
+        // console.log("");
 
         expect.fail("The transaction vote() should have failed but it didn't.");
 
@@ -1105,8 +1105,8 @@ describe("ato", () => {
           .signers([walletAlain])
           .rpc();
 
-          console.log("https://solana.fm/tx/"+txVote);
-          console.log("");
+          // console.log("https://solana.fm/tx/"+txVote);
+          // console.log("");
 
           expect.fail("The transaction vote() should have failed but it didn't.");
 
@@ -1138,34 +1138,31 @@ describe("ato", () => {
 
     it("Voting is closed !", async () => {
 
-      //await monitor(program, "Voting is closed !");
+      // const proposalIndexHead = (
+      //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      // ).proposalIndexHead.valueOf();
+      // console.log("prop  idx head : " + proposalIndexHead);
 
-      const proposalIndexHead = (
-        await program.account.atoData.fetch(atoDataKeypair.publicKey)
-      ).proposalIndexHead.valueOf();
-      console.log("prop  idx head : " + proposalIndexHead);
-
-      const proposalIndexTail = (
-        await program.account.atoData.fetch(atoDataKeypair.publicKey)
-      ).proposalIndexTail.valueOf();
-      console.log("prop  idx tail : " + proposalIndexTail);
+      // const proposalIndexTail = (
+      //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
+      // ).proposalIndexTail.valueOf();
+      // console.log("prop  idx tail : " + proposalIndexTail);
 
       // const voterIndexTail = (
       //   await program.account.atoData.fetch(atoDataKeypair.publicKey)
       // ).voterIndexTail.valueOf();
       // console.log("voter idx tail : " + voterIndexTail);
 
-      let allVote = await program.account.atoVote.all();
-      let amount = allVote[1].account.amount;
-      console.log(amount);
-      let voteIndex = allVote[1].account.voteIndex;
-      console.log(voteIndex);
-      console.log("amount: ", allVote[1].account.amount);
+      // let allVote = await program.account.atoVote.all();
+      // let amount = allVote[1].account.amount;
+      // console.log(amount);
+      // let voteIndex = allVote[1].account.voteIndex;
+      // console.log(voteIndex);
+      // console.log("amount: ", allVote[1].account.amount);
 
+      //await monitor(program, "Voting is closed !");
       await showAllVoters( program, accounts, atoDataKeypair);
       await showAllProposals( program, atoDataKeypair);
-      // await showVoter(program, accounts, 0);
-      // await showVoter(program, accounts, 1);
 
     });
 
