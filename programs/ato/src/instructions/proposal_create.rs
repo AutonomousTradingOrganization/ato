@@ -69,6 +69,7 @@ pub fn call(
 	//msg!("proposal {} / {}", title, prop_data.index);	// debug purpose
 	// debug purpose
 	ato_data.proposal_index_tail += 1;
+	check_index!(ato_data.proposal_index_tail);
 
 	Ok(())
 

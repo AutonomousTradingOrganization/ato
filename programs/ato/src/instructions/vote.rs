@@ -46,6 +46,7 @@ pub fn call(
 	vote_data.proposal_index   = prop_data.index;
 	vote_data.voter_index      = voter_data.index;
 	vote_data.vote_index       = prop_data.vote_index_tail;
+	check_index!(prop_data.vote_index_tail);
 	prop_data.vote_index_tail += 1;
 
 	// debug purpose

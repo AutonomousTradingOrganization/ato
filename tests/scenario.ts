@@ -109,6 +109,8 @@ async function showProposal( program, indexArray) {
   const deadline  = allProp[indexArray].account.deadline;
   const voteYes   = allProp[indexArray].account.voteYes;
   const voteNo    = allProp[indexArray].account.voteNo;
+  const mode      = allProp[indexArray].account.mode;
+  const status    = allProp[indexArray].account.status;
 
   console.log("proposal  # "+index);
   console.log("title     : "+title);
@@ -119,6 +121,16 @@ async function showProposal( program, indexArray) {
   console.log("no        : "+voteNo);
   console.log("amount    : "+amount);
   console.log("pubkey    : "+key);
+
+    const PropStatusString: string[] = [
+      "Waiting",
+      "Opened",
+      "Closed",
+      "Paused",
+      "Canceled",
+      "Error",
+  ];
+  console.log("status   : "+PropStatusString[status]);
 
   console.log("----------------");
   console.log("");
@@ -613,15 +625,13 @@ describe("scenario", () => {
 
 
     propsIndex = 0;
-    // propsIndexBuffer = Buffer.allocUnsafe(2);
-    // propsIndexBuffer.writeUInt16LE(propsIndex, 0);
+    propsIndexBuffer = Buffer.allocUnsafe(2);
+    propsIndexBuffer.writeUInt16LE(tailIndex, 0);
 
     tailIndex       = allProp[propsIndex].account.voteIndexTail;
     tailIndexBuffer = Buffer.allocUnsafe(2);
     tailIndexBuffer.writeUInt16LE(tailIndex, 0);
   
-    propsIndexBuffer = Buffer.allocUnsafe(2);
-    propsIndexBuffer.writeUInt16LE(tailIndex, 0);
   
     const [votePubkey, voteBump] = await anchor.web3.PublicKey.findProgramAddress(
       [

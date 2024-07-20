@@ -42,3 +42,9 @@ macro_rules! string_to_u8 {
 		//$storage_title
 	}};
 }
+
+macro_rules! check_index {
+	($index:expr) => {{
+		require_gt!(ATO_INDEX_MAX, $index, AtoError::OutOfBoundIndex);
+	}};
+}

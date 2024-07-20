@@ -21,6 +21,8 @@ pub fn call(
 	require_gte!(STR_SIZE_EMAIL, email.len(), AtoError::IncorrectEmailLenght);
 	string_to_u8!(email, voter_data.email);
 
+	check_index!(voter_data.index);
+
 	voter_data.voter = ctx.accounts.voter.key();
 	voter_data.index = ato_data.voter_index_tail;
 	// debug purpose

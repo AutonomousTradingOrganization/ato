@@ -13,6 +13,7 @@ pub const STR_SIZE_DESCR: usize = 100;
 pub const STR_SIZE_NAME: usize  = 64;
 pub const STR_SIZE_EMAIL: usize = 64;
 
+pub const ATO_INDEX_MAX: u16 = 65500;
 
 pub enum AtoStatus {
 	NotReady,	// Not totaly initialized (scheduler key ?)

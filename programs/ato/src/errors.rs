@@ -48,4 +48,7 @@ pub enum AtoError {
 	#[msg("Already voted.")]
 	AlreadyVoted,
 
+	#[msg("Out of bound index.")]
+	OutOfBoundIndex,
+
 }
