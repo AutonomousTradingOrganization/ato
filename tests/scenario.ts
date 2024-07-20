@@ -148,24 +148,22 @@ async function showAllProposals( program, atoDataKeypair: anchor.web3.Keypair) {
 }
 
 
-async function showVote( program, account, indexArray) {
+async function showVote( program, accounts, indexProp) {
   const allProp = await program.account.atoProposal.all();
-  if(allProp[indexArray].account.voteIndexTail <= 0) {return;}
+  if(allProp[indexProp].account.voteIndexTail <= 0) {return;}
 
-  const proposalIndex = allProp[indexArray].account.proposalIndex;
-  const voterIndex    = allProp[indexArray].account.voterIndex;
-  const voteIndex     = allProp[indexArray].account.voteIndex;
+  const proposalIndex = allProp[indexProp].account.proposalIndex;
+  const voterIndex    = allProp[indexProp].account.voterIndex;
+  const voteIndex     = allProp[indexProp].account.index;
+
+  const allVoter = await program.account.atoVoter.all();
 
   console.log("----------------");
 
   console.log("vote     # "+voteIndex);
   const voterName = "toto";
-  const propName  = String.fromCharCode(...allProp[indexArray].account.title.filter(charCode => charCode !== 0));
-
-  const allVoter = await program.account.atoVoter.all();
-
+  const propName  = String.fromCharCode(...allProp[indexProp].account.title.filter(charCode => charCode !== 0));
   console.log(voterName+ " --> "+ propName);
-
 
   console.log("----------------");
   console.log("");
@@ -214,7 +212,6 @@ async function getPubkeyFromProposal(provider, program: anchor.Program<Ato>, ind
     provider.wallet.publicKey.toBuffer(),
     propsIndexBuffer,
   ];
-  //console.log(seeds);
 
   const [pubkey, _bump] = await anchor.web3.PublicKey.findProgramAddress(
     seeds,
@@ -269,9 +266,6 @@ describe("scenario", () => {
   const ATO_PROPS_STATUS_CANCELED = 4;
   const ATO_PROPS_STATUS_ERROR    = 5;
 
-
-  let seedsProp1;
-  let seedsProp2;
 
   it("Is initialized!", async () => {
 
@@ -368,7 +362,6 @@ describe("scenario", () => {
 
   let tailIndex: number;
   let props: { pubkey: any; bump?: number; };
-  let seeds;
 
   tailIndex = (
     await program.account.atoData.fetch(atoDataKeypair.publicKey)
@@ -381,16 +374,15 @@ describe("scenario", () => {
   //console.log(">")
   //console.log(propsIndexBuffer);
 
-  seeds = [
-    Buffer.from("ATO_PROP"),
-    provider.wallet.publicKey.toBuffer(),
-    propsIndexBuffer,
-  ];
-  console.log(seeds);
-
+  ;
+  
   // Calculer l'adresse de la PDA
   let [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
-    seeds,
+    [
+      Buffer.from("ATO_PROP"),
+      provider.wallet.publicKey.toBuffer(),
+      propsIndexBuffer,
+    ],
     program.programId
   );
 
@@ -399,8 +391,6 @@ describe("scenario", () => {
     bump  : propsBump,
   };
   
-  seedsProp1 = props.pubkey;
-
   let txProp = await program.methods
     .proposalCreate(
       title,
@@ -439,15 +429,13 @@ describe("scenario", () => {
   //console.log(">")
   //console.log(propsIndexBuffer);
   
-  seeds =     [
-    Buffer.from("ATO_PROP"),
-    provider.wallet.publicKey.toBuffer(),
-    propsIndexBuffer,
-  ];
-
   // Calculer l'adresse de la PDA
   [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
-    seeds,
+    [
+      Buffer.from("ATO_PROP"),
+      provider.wallet.publicKey.toBuffer(),
+      propsIndexBuffer,
+    ],
     program.programId
   );
 
@@ -619,21 +607,18 @@ describe("scenario", () => {
 
     let propsIndexBuffer: Buffer;
     let tailIndexBuffer : Buffer;
+    let propPubkey;
 
     const allProp = await program.account.atoProposal.all();
 
 
     propsIndex = 0;
-    propsIndexBuffer = Buffer.allocUnsafe(2);
-    propsIndexBuffer.writeUInt16LE(propsIndex, 0);
-    console.log(">> prop #1 ");
-    console.log(propsIndexBuffer);
+    // propsIndexBuffer = Buffer.allocUnsafe(2);
+    // propsIndexBuffer.writeUInt16LE(propsIndex, 0);
 
     tailIndex       = allProp[propsIndex].account.voteIndexTail;
     tailIndexBuffer = Buffer.allocUnsafe(2);
     tailIndexBuffer.writeUInt16LE(tailIndex, 0);
-    console.log(">> tail prop #1 ");
-    console.log(propsIndexBuffer);
   
     propsIndexBuffer = Buffer.allocUnsafe(2);
     propsIndexBuffer.writeUInt16LE(tailIndex, 0);
@@ -653,26 +638,19 @@ describe("scenario", () => {
     };
 
     const amount = 200000;
-    const now = 19;
-    ///
-    console.log("sp1");
-    console.log(seedsProp1);
-    ///
-    const k = await getPubkeyFromProposal( provider, program, propsIndex, walletAlain);
-    console.log("k");
-    console.log(k);
-    ///
+    const now    = 19;
+
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex, walletAlain);
 
     let txVote = await program.methods
       .vote(
         true,
         new anchor.BN(amount),  // amount (Lamports >= MIN)
         new anchor.BN(now)      // now (s < proposal deadline)
-      )
-      .accounts({
+      ).accounts({
         voteData     : seeds.pubkey,
         voterData    : voterAlain.pubkey,
-        propData     : seedsProp1,
+        propData     : propPubkey,
         atoData      : atoDataKeypair.publicKey,
         voter        : walletAlain.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -686,6 +664,5 @@ describe("scenario", () => {
     await showAllVotes( program, accounts, atoDataKeypair);
 
   });
-
 
 });
