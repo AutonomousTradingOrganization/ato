@@ -88,6 +88,7 @@ pub struct AtoProposal {
 	pub description    : [u8; STR_SIZE_DESCR],
 	pub mode           : u8,
 	pub status         : u8,
+	pub trade          : bool,
 }
 
 #[derive(Accounts)]

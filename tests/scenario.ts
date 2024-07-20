@@ -4,6 +4,17 @@ import { Ato } from "../target/types/ato";
 import { expect } from "chai";
 import { publicKey } from "@coral-xyz/anchor/dist/cjs/utils";
 
+const ATO_PROPS_STATUS_WAITING  = 0;
+const ATO_PROPS_STATUS_OPENED   = 1;
+const ATO_PROPS_STATUS_CLOSED   = 2;
+const ATO_PROPS_STATUS_PAUSED   = 3;
+const ATO_PROPS_STATUS_CANCELED = 4;
+const ATO_PROPS_STATUS_ERROR    = 5;
+
+const ATO_PROPS_MODE_OVER  = 0;
+const ATO_PROPS_MODE_LOWER = 1;
+const ATO_PROPS_MODE_TIMING = 2;
+
 
 // this airdrops sol to an address
 async function airdropSol(publicKey, amount) {
@@ -14,9 +25,9 @@ async function airdropSol(publicKey, amount) {
 async function confirmTransaction(tx) {
   const latestBlockHash = await anchor.getProvider().connection.getLatestBlockhash();
   await anchor.getProvider().connection.confirmTransaction({
-  blockhash: latestBlockHash.blockhash,
-  lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-  signature: tx,
+    blockhash: latestBlockHash.blockhash,
+    lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+    signature: tx,
   });
 }
 
@@ -131,15 +142,22 @@ async function showProposal( program, indexArray) {
   console.log("amount    : "+amount);
   console.log("pubkey    : "+key);
 
-    const PropStatusString: string[] = [
-      "Waiting",
-      "Opened",
-      "Closed",
-      "Paused",
-      "Canceled",
-      "Error",
+  const PropStatusString: string[] = [
+    "Waiting",
+    "Opened",
+    "Closed",
+    "Paused",
+    "Canceled",
+    "Error",
   ];
   console.log("status   : "+PropStatusString[status]);
+
+  const PropModeString: string[] = [
+    "Over",
+    "Lower",
+    "Timing",
+  ];
+  console.log("mode     : "+PropModeString[mode]);
 
   console.log("----------------");
   console.log("");
@@ -162,14 +180,96 @@ async function showAllProposals( program, atoDataKeypair: anchor.web3.Keypair) {
   console.log("proposal(s) : "+ (proposalIndexTail-proposalIndexHead) +" [" + proposalIndexHead+" - " + (proposalIndexTail-1)+"]");
 
   for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
-  await showProposal(program, i);
+    await showProposal(program, i);
   }
 
   console.log("");
 }
 
 
-async function showVote( program, accounts, indexProp) {
+async function checkProposal( program, indexArray, value, now) {
+  const allProp = await program.account.atoProposal.all();
+  const status    = allProp[indexArray].account.status;
+  if(status != ATO_PROPS_STATUS_OPENED) { return;}
+
+  console.log("----------------");
+
+  //console.log(allProp[indexArray]);
+
+  const index     = allProp[indexArray].account.index;
+  const title     = String.fromCharCode(...allProp[indexArray].account.title.filter(charCode => charCode !== 0));
+  const key       = allProp[indexArray].publicKey;
+  const amount    = allProp[indexArray].account.amount;
+  const threshold = allProp[indexArray].account.threshold;
+  const deadline  = allProp[indexArray].account.deadline;
+  const voteYes   = allProp[indexArray].account.voteYes;
+  const voteNo    = allProp[indexArray].account.voteNo;
+  const mode      = allProp[indexArray].account.mode;
+
+  const PropStatusString: string[] = [
+    "Waiting",
+    "Opened",
+    "Closed",
+    "Paused",
+    "Canceled",
+    "Error",
+  ];
+
+  switch( mode) {
+    case ATO_PROPS_MODE_OVER: {
+      if( value >= threshold) {
+        // TODO
+      }
+    }
+
+    case ATO_PROPS_MODE_LOWER: {
+      if( value <= threshold) {
+        // TODO
+      }
+    }
+
+    case ATO_PROPS_MODE_TIMING: {
+       // TODO
+    }
+
+  }
+
+  console.log("----------------");
+  console.log("");
+
+}
+
+/*
+changer :
+- status proposal -> AtoProposalStatus::Closed
+- trade flag proposal -> true
+
+*/
+
+async function check( program, atoDataKeypair: anchor.web3.Keypair, value, now) {
+
+  console.log("================");
+
+  const proposalIndexHead = (
+  await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).proposalIndexHead.valueOf();
+  //-console.log("prop  idx head : " + proposalIndexHead);
+
+  const proposalIndexTail = (
+  await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).proposalIndexTail.valueOf();
+  //-console.log("prop  idx tail : " + proposalIndexTail);
+  //console.log("proposal(s) : "+ (proposalIndexTail-proposalIndexHead) +" [" + proposalIndexHead+" - " + (proposalIndexTail-1)+"]");
+
+  for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
+    await checkProposal(program, i, value, now);
+  }
+
+  console.log("");
+}
+
+
+async function showVote( program, /*accounts,*/ indexProp) {
   const allProp = await program.account.atoProposal.all();
   if(allProp[indexProp].account.voteIndexTail <= 0) {return;}
 
@@ -191,7 +291,8 @@ async function showVote( program, accounts, indexProp) {
   
 }
 
-async function showAllVotes( program, account, atoDataKeypair: anchor.web3.Keypair) {
+
+async function showAllVotes( program, /*accounts,*/ atoDataKeypair: anchor.web3.Keypair) {
 
   console.log("================");
 
@@ -216,7 +317,7 @@ async function showAllVotes( program, account, atoDataKeypair: anchor.web3.Keypa
   console.log(totalNnVote+" vote(s)");
 
   for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
-    await showVote(program, account, i);
+    await showVote(program, /*accounts,*/ i);
   }
   
   console.log("");
@@ -276,16 +377,16 @@ describe("scenario", () => {
   const ATO_STATUS_READY      = 1;
   const PUBLICKEY_DEFAULT_STR = "11111111111111111111111111111111";
 
-  const ATO_PROPS_MODE_OVER  = 0;
-  const ATO_PROPS_MODE_LOWER = 1;
-  const ATO_PROPS_MODE_DELAY = 2;
+  // const ATO_PROPS_MODE_OVER  = 0;
+  // const ATO_PROPS_MODE_LOWER = 1;
+  // const ATO_PROPS_MODE_TIMING = 2;
 
-  const ATO_PROPS_STATUS_WAITING  = 0;
-  const ATO_PROPS_STATUS_OPENED   = 1;
-  const ATO_PROPS_STATUS_CLOSED   = 2;
-  const ATO_PROPS_STATUS_PAUSED   = 3;
-  const ATO_PROPS_STATUS_CANCELED = 4;
-  const ATO_PROPS_STATUS_ERROR    = 5;
+  // const ATO_PROPS_STATUS_WAITING  = 0;
+  // const ATO_PROPS_STATUS_OPENED   = 1;
+  // const ATO_PROPS_STATUS_CLOSED   = 2;
+  // const ATO_PROPS_STATUS_PAUSED   = 3;
+  // const ATO_PROPS_STATUS_CANCELED = 4;
+  // const ATO_PROPS_STATUS_ERROR    = 5;
 
 
   it("Is initialized!", async () => {
@@ -373,12 +474,12 @@ describe("scenario", () => {
 
   });
 
-  it("Proposals creation", async () => {
+  it("STEP #1 - Proposals creation", async () => {
 
   let title       = "Proposal #1";
   let description = "Description for proposal #1";
   let mode        = ATO_PROPS_MODE_OVER;
-  let threshold   = 1;
+  let threshold   = 1337;
   let deadline    = 120;
 
   let tailIndex: number;
@@ -440,10 +541,61 @@ describe("scenario", () => {
 
   title       = "Proposal #2";
   description = "Description for proposal #2";
-  mode        = ATO_PROPS_MODE_OVER;
+  mode        = ATO_PROPS_MODE_TIMING;
   threshold   = 1;
-  deadline    = 120;
+  deadline    = 3000;
 
+  propsIndexBuffer = Buffer.allocUnsafe(2);
+  propsIndexBuffer.writeUInt16LE(tailIndex, 0);
+  //console.log(">")
+  //console.log(propsIndexBuffer);
+  
+  // Calculer l'adresse de la PDA
+  [propsPubkey, propsBump] = await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from("ATO_PROP"),
+      provider.wallet.publicKey.toBuffer(),
+      propsIndexBuffer,
+    ],
+    program.programId
+  );
+
+  props = {
+    pubkey: propsPubkey,
+    bump  : propsBump,
+  };
+
+  txProp = await program.methods
+    .proposalCreate(
+      title,
+      description,
+      mode,
+      new anchor.BN(threshold),
+      new anchor.BN(deadline)
+    ).accounts({
+      propData     : props.pubkey,
+      atoData      : atoDataKeypair.publicKey,
+      signer       : provider.wallet.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    })
+    //.signers([provider.wallet])
+    .rpc();
+
+  console.log("(prop #"+tailIndex+") https://solana.fm/tx/"+txProp);
+  console.log("");
+
+
+  tailIndex = (
+    await program.account.atoData.fetch(atoDataKeypair.publicKey)
+  ).proposalIndexTail.valueOf();
+  //console.log(">")
+  //console.log(tailIndex);
+
+  title       = "Proposal #3";
+  description = "Description for proposal #2";
+  mode        = ATO_PROPS_MODE_TIMING;
+  threshold   = 1;
+  deadline    = 5000;
 
   propsIndexBuffer = Buffer.allocUnsafe(2);
   propsIndexBuffer.writeUInt16LE(tailIndex, 0);
@@ -620,9 +772,9 @@ describe("scenario", () => {
   });
 
 
-  it("Proposals are now open...", async () => {
+  it("STEP 2 - Changement d'états ...", async () => {
 
-    const opened = 1;
+    let status;
     let txStatus  : string;
     let propPubkey: anchor.web3.PublicKey;
     let propsIndex: number;
@@ -630,10 +782,11 @@ describe("scenario", () => {
 
     propsIndex = 0;
     propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+    status = ATO_PROPS_STATUS_WAITING;
 
     txStatus = await program.methods
       .proposalSetStatus(
-        opened,
+        status,
       ).accounts({
         propData     : propPubkey,
         atoData      : atoDataKeypair.publicKey,
@@ -649,10 +802,31 @@ describe("scenario", () => {
 
     propsIndex = 1;
     propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+    status = ATO_PROPS_STATUS_OPENED;
 
     txStatus = await program.methods
       .proposalSetStatus(
-        opened,
+        status,
+      ).accounts({
+        propData     : propPubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+  
+    console.log("(prop status...) https://solana.fm/tx/"+txStatus);
+    console.log("");
+  
+
+    propsIndex = 2;
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+    status = ATO_PROPS_STATUS_OPENED;
+
+    txStatus = await program.methods
+      .proposalSetStatus(
+        status,
       ).accounts({
         propData     : propPubkey,
         atoData      : atoDataKeypair.publicKey,
@@ -669,7 +843,7 @@ describe("scenario", () => {
   });
 
 
-  it("Some votes...", async () => {
+  it("STEP 3 - Alain vote Yes -> A", async () => {
 
     let propsIndex: number;
     let tailIndex : number;
@@ -709,28 +883,80 @@ describe("scenario", () => {
 
     propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
 
-    let txVote = await program.methods
-      .vote(
-        true,
-        new anchor.BN(amount),  // amount (Lamports >= MIN)
-        new anchor.BN(now)      // now (s < proposal deadline)
-      ).accounts({
-        voteData     : seeds.pubkey,
-        voterData    : voterAlain.pubkey,
-        propData     : propPubkey,
-        atoData      : atoDataKeypair.publicKey,
-        voter        : walletAlain.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .signers([walletAlain])
-      .rpc();
+    try {
+      let txVote = await program.methods
+        .vote(
+          true,
+          new anchor.BN(amount),  // amount (Lamports >= MIN)
+          new anchor.BN(now)      // now (s < proposal deadline)
+        ).accounts({
+          voteData     : seeds.pubkey,
+          voterData    : voterAlain.pubkey,
+          propData     : propPubkey,
+          atoData      : atoDataKeypair.publicKey,
+          voter        : walletAlain.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([walletAlain])
+        .rpc();
 
-      console.log("(vote) https://solana.fm/tx/"+txVote);
-      console.log("");
+        console.log("(vote) https://solana.fm/tx/"+txVote);
+        console.log("");
+    } catch(err) {
+      const msg = "Incorrect proposal status.";
+      expect(err.message).to.include(msg);
+      console.log("    Fail to vote (Error message \""+msg+"\")");
+    }
 
-    await showAllVotes( program, accounts, atoDataKeypair);
     await showVault(atoDataKeypair);
 
+  });
+
+  it("STEP 3 - Alain vote Yes -> A", async () => {
+
+    let status;
+    let txStatus  : string;
+    let propPubkey: anchor.web3.PublicKey;
+    let propsIndex: number;
+
+
+    propsIndex = 0;
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+    status = ATO_PROPS_STATUS_OPENED;
+
+    txStatus = await program.methods
+      .proposalSetStatus(
+        status,
+      ).accounts({
+        propData     : propPubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+  
+    console.log("(prop status...) https://solana.fm/tx/"+txStatus);
+    console.log("");
+  
+    await showAllProposals( program, atoDataKeypair);
+  });
+
+  it("STEP 4 - Check", async () => {
+
+    const proposalIndexHead = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexHead.valueOf();
+    //-console.log("prop  idx head : " + proposalIndexHead);
+  
+    const proposalIndexTail = (
+    await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexTail.valueOf();
+  
+    for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
+      await showProposal(program, i);
+    }
+    
   });
 
 });

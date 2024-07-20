@@ -50,7 +50,7 @@ Les votes sont exprimés en pourcentage de la somme totale des votes sur la prop
 
 ## Prérequis
 
-- La DAO a été déployée et initialisée correctement.
+- Le programme de la DAO a été déployée et initialisée correctement.
 - Les comptes des quatre votants (_Alain, Bernard, Céline, Damien et Eric_) ont été créés et possèdent un wallet permettant d'exploiter les fonctionalités de cette DAO.
 - Un Oracle aurait dû être normalement intégré à la DAO pour fournir des données externes. En l'absence de celui-ci, la donnée fournie par l'oracle sera simulée...
 - De même l'écoulement du temps sera simulé !
@@ -60,33 +60,34 @@ Les votes sont exprimés en pourcentage de la somme totale des votes sur la prop
 
 Le créateur de la DAO propose trois sujets de vote :
 
-- **Proposition A** : Acheter en commun du "Alyra Coin" Si il passe la valeur `1337`
+- **Proposition A** : Acheter en commun du "Alyra Coin" Si il dépasse la valeur `1337`
 - **Proposition B** : Acheter du "NV Coin" dans 3 unités de temps.
 - **Proposition C** : Acheter du "FM Coin" dans 7 unités de temps.
 
 ### Déroulement
 
-| Actions              | A           | B           | C           |
-| -------------------- | ----------- | ----------- | ----------- |
-| Création             | Créé        | Créé        | Créé        |
-| Changement d'états   | 'Waiting'   | 'Opened'    | 'Opened'    |
-| Alain vote Yes -> A  | Fail        |             |             |
-| Changement d'états   | 'Opened'    | 'Opened'    | 'Opened'    |
-| Check                |             |             |             |
-| Alain vote Yes -> A  | Y:1 N:0     |             |             |
-| Alain vote Yes -> B  | Y:1 N:0     | Y:1 N:0     |             |
-| Check                |             |             |             |
-| Bernard vote No -> A | Y:1 N:1     |             |             |
-| Check                |             |             |             |
-| Alain vote Yes -> A  | Y:2 N:1     |             |             |
-| Céline vote Yes -> B |             | Y:2 N:0     |             |
-| Damien vote No -> B  |             | Y:2 N:1     |             |
-| Damien vote No -> C  |             |             | Y:0 N:1     |
-| 3 unités de temps    |             |             |             |
-| Check                |             | ✨ 'Closed' |             |
-| Check (seuil A)      | ✨ 'Closed' |             |             |
-| 5 unités de temps    |             |             |             |
-| Check                |             |             | ✨ 'Closed' |
+|     | Actions              | A           | B           | C           |
+| --- | -------------------- | ----------- | ----------- | ----------- |
+| 1   | Création             | Créé        | Créé        | Créé        |
+| 2   | Changement d'états   | 'Waiting'   | 'Opened'    | 'Opened'    |
+| 3   | Alain vote Yes -> A  | Fail        |             |             |
+| 4   | Changement d'états   | 'Opened'    |             |             |
+|     | Check                |             |             |             |
+|     | Alain vote Yes -> A  | Y:1 N:0     |             |             |
+|     | Alain vote Yes -> B  | Y:1 N:0     | Y:1 N:0     |             |
+|     | Check                |             |             |             |
+|     | Bernard vote No -> A | Y:1 N:1     |             |             |
+|     | Check                |             |             |             |
+|     | Alain vote Yes -> A  | Y:2 N:1     |             |             |
+|     | Céline vote Yes -> B |             | Y:2 N:0     |             |
+|     | Damien vote No -> B  |             | Y:2 N:1     |             |
+|     | Damien vote No -> C  |             |             | Y:0 N:1     |
+|     | 3 unités de temps    |             |             |             |
+|     | Check                |             | ✨ 'Closed' |             |
+|     | (seuil A atteint)    |             |             |             |
+|     | Check                | ✨ 'Closed' |             |             |
+|     | 5 unités de temps    |             |             |             |
+|     | Check                |             |             | ✨ 'Closed' |
 
 ### Résultats attendus
 

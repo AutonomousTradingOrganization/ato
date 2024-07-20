@@ -61,7 +61,7 @@ impl From<u8> for AtoProposalStatus {
 pub enum AtoProposalMode {
 	Over,
 	Lower,
-	Delay,
+	Timing,
 	MAX
 }
 
@@ -70,7 +70,7 @@ impl From<u8> for AtoProposalMode {
 		match value {
 			0 => AtoProposalMode::Over,
 			1 => AtoProposalMode::Lower,
-			2 => AtoProposalMode::Delay,
+			2 => AtoProposalMode::Timing,
 			_ => panic!("Invalid AtoProposalMode value"),
 		}
 	}
