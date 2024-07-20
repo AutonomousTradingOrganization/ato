@@ -40,9 +40,11 @@ pub fn call(
 	vote_data.amount    = amount;
 	vote_data.timestamp = now;
 	vote_data.vote      = vote;
+
 	// debug purpose
 	//vote_data.leet1          = 4916;
 	//vote_data.leet2          = 4919;
+	// debug purpose
 	vote_data.proposal_index   = prop_data.index;
 	vote_data.voter_index      = voter_data.index;
 	vote_data.vote_index       = prop_data.vote_index_tail;

@@ -215,7 +215,7 @@ async function showAllVotes( program, account, atoDataKeypair: anchor.web3.Keypa
 
 
 
-async function getPubkeyFromProposal(provider, program: anchor.Program<Ato>, index: number, signer: anchor.web3.Signer) {
+async function getPubkeyFromProposal(provider, program: anchor.Program<Ato>, index: number) {
   let propsIndexBuffer = Buffer.allocUnsafe(2);
   propsIndexBuffer.writeUInt16LE(index, 0);
 
@@ -481,7 +481,6 @@ describe("scenario", () => {
 
   it("Voters registrations", async () => {
 
-
     accounts = await createAccounts(5, 2);
 
     walletAlain   = accounts[0];
@@ -612,6 +611,53 @@ describe("scenario", () => {
   });
 
 
+  it("Proposals are now open...", async () => {
+
+    const opened = 1;
+    let txStatus;
+    let propPubkey;
+    let propsIndex;
+
+    propsIndex = 0;
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+
+    txStatus = await program.methods
+      .proposalSetStatus(
+        opened,
+      ).accounts({
+        propData     : propPubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+  
+    console.log("(prop status...) https://solana.fm/tx/"+txStatus);
+    console.log("");
+  
+    propsIndex = 1;
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
+
+    txStatus = await program.methods
+      .proposalSetStatus(
+        opened,
+      ).accounts({
+        propData     : propPubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+  
+    console.log("(prop status...) https://solana.fm/tx/"+txStatus);
+    console.log("");
+  
+    await showAllProposals( program, atoDataKeypair);
+  });
+
+
   it("Some votes...", async () => {
 
     let propsIndex: number;
@@ -650,7 +696,7 @@ describe("scenario", () => {
     const amount = 200000;
     const now    = 19;
 
-    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex, walletAlain);
+    propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
 
     let txVote = await program.methods
       .vote(

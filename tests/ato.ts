@@ -552,8 +552,41 @@ describe("ato", () => {
   });
 
 
+  it("proposal_set_status() change status for both...", async () => {
+    const opened = 1;
+    let txStatus;
+    let propPubkey;
+    let propsIndex;
+
+    txStatus = await program.methods
+      .proposalSetStatus(
+        opened,
+      ).accounts({
+        propData     : prop1.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+
+      txStatus = await program.methods
+      .proposalSetStatus(
+        opened,
+      ).accounts({
+        propData     : prop2.pubkey,
+        atoData      : atoDataKeypair.publicKey,
+        signer       : provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      //.signers([provider.wallet])
+      .rpc();
+
+  });
+
+
   it("voter_registration(): do it...", async () => {
-    accounts = await createAccounts(5, 2);
+      accounts = await createAccounts(5, 2);
 
     walletAlain   = accounts[0];
     walletBernard = accounts[1];

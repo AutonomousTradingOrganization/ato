@@ -35,7 +35,7 @@ impl From<u8> for AtoStatus {
 
 pub enum AtoProposalStatus {
 	Waiting,	// Presentation, you can't vote for it yet...
-	Opened,	// Ready, you can vote for it
+	Opened,		// Ready, you can vote for it
 	Closed,		// Sorry, vote is over
 	Paused,		// Damned !
 	Canceled,	// Proposal is canceled, leave it !

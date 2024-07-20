@@ -54,7 +54,7 @@ pub fn call(
 	prop_data.vote_index_tail = 0;
 	string_to_u8!(title, prop_data.title);
 	string_to_u8!(description, prop_data.description);
-	prop_data.status    = AtoProposalStatus::Opened as u8;
+	prop_data.status    = AtoProposalStatus::Waiting as u8;
 
 	// debug purpose
 	// msg!("{:?}", prop_data.title);
