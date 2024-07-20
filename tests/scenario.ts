@@ -35,6 +35,15 @@ async function createAccounts(nn: number, amount: number) {
   return accounts;
 }
 
+async function showVault(atoDataKeypair: anchor.web3.Keypair) {
+  let balance: number;
+
+  console.log("================");
+  const key = atoDataKeypair.publicKey;
+  balance = await anchor.getProvider().connection.getBalance(key);
+  console.log("vault : "+balance);
+  console.log("");
+}
 
 async function monitor( program, comment) {
 
@@ -614,9 +623,10 @@ describe("scenario", () => {
   it("Proposals are now open...", async () => {
 
     const opened = 1;
-    let txStatus;
-    let propPubkey;
-    let propsIndex;
+    let txStatus  : string;
+    let propPubkey: anchor.web3.PublicKey;
+    let propsIndex: number;
+
 
     propsIndex = 0;
     propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
@@ -636,6 +646,7 @@ describe("scenario", () => {
     console.log("(prop status...) https://solana.fm/tx/"+txStatus);
     console.log("");
   
+
     propsIndex = 1;
     propPubkey = await getPubkeyFromProposal( provider, program, propsIndex);
 
@@ -718,6 +729,7 @@ describe("scenario", () => {
       console.log("");
 
     await showAllVotes( program, accounts, atoDataKeypair);
+    await showVault(atoDataKeypair);
 
   });
 

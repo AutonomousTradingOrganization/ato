@@ -58,6 +58,7 @@ async function monitor( program, comment) {
   //console.log("amount: ", allVote[1].account.amount);
 }
 
+
 async function showVoter( program: anchor.Program<Ato>, accounts: any[], indexArray: string | number) {
   const allVoter = await program.account.atoVoter.all();
   console.log("----------------");
@@ -1190,7 +1191,6 @@ describe("ato", () => {
       // let voteIndex = allVote[1].account.voteIndex;
       // console.log(voteIndex);
       // console.log("amount: ", allVote[1].account.amount);
-
       //await monitor(program, "Voting is closed !");
       await showAllVoters( program, accounts, atoDataKeypair);
       await showAllProposals( program, atoDataKeypair);
