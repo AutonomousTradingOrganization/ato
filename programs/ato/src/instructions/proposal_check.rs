@@ -13,7 +13,7 @@ pub fn call(
 	//scheduler_only!(ctx);
 	//let ato_data: &mut Account<AtoData>      = &mut ctx.accounts.ato_data;
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-
+	//mode = prop_data.mode;
 	// TODO
 	msg!("PROPOSAL CHECK");
 	Ok(())

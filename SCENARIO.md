@@ -72,9 +72,9 @@ Le créateur de la DAO propose trois sujets de vote :
 | 2   | Changement d'états   | 'Waiting'   | 'Opened'    | 'Opened'    |
 | 3   | Alain vote Yes -> A  | Fail        |             |             |
 | 4   | Changement d'états   | 'Opened'    |             |             |
-|     | Check                |             |             |             |
-|     | Alain vote Yes -> A  | Y:1 N:0     |             |             |
-|     | Alain vote Yes -> B  | Y:1 N:0     | Y:1 N:0     |             |
+| 5   | Check                |             |             |             |
+| 6   | Alain vote Yes -> A  | Y:1 N:0     |             |             |
+| 7   | Alain vote Yes -> B  | Y:1 N:0     | Y:1 N:0     |             |
 |     | Check                |             |             |             |
 |     | Bernard vote No -> A | Y:1 N:1     |             |             |
 |     | Check                |             |             |             |

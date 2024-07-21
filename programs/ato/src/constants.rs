@@ -8,8 +8,8 @@ pub const ATO_LABEL_VOTE: &[u8; 8]     = b"ATO_VOTE";
 
 pub const ATO_AMOUNT_LAMPORTS_MIN: u64 = 100000;
 
-pub const STR_SIZE_TITLE: usize = 32;
-pub const STR_SIZE_DESCR: usize = 100;
+pub const STR_SIZE_TITLE: usize = 64;
+pub const STR_SIZE_DESCR: usize = 512;
 pub const STR_SIZE_NAME: usize  = 64;
 pub const STR_SIZE_EMAIL: usize = 64;
 
