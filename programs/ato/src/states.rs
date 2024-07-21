@@ -88,7 +88,7 @@ pub struct AtoProposal {
 	pub description    : [u8; STR_SIZE_DESCR],
 	pub mode           : u8,
 	pub status         : u8,
-	pub trade          : bool,
+	pub trade          : u8,
 }
 
 #[derive(Accounts)]
@@ -234,6 +234,28 @@ pub struct VoterAdd<'info> {
 		mut,
 	)]
 	pub voter: Signer<'info>,
+
+	pub system_program: Program<'info, System>,
+}
+
+
+#[derive(Accounts)]
+pub struct ProposalCheck<'info> {
+
+	#[account(
+		mut,
+	)]
+	pub prop_data: Account<'info, AtoProposal>,
+	
+	// #[account(
+	// 	mut,
+	// )]
+	// pub ato_data: Account<'info, AtoData>,
+
+	#[account(
+		mut,
+	)]
+	pub signer: Signer<'info>,
 
 	pub system_program: Program<'info, System>,
 }

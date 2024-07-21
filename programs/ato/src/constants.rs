@@ -75,3 +75,20 @@ impl From<u8> for AtoProposalMode {
 		}
 	}
 }
+
+pub enum AtoProposalTrade {
+	Pending,
+	ToDo,
+	Done,
+}
+
+impl From<u8> for AtoProposalTrade {
+	fn from(value: u8) -> Self {
+		match value {
+			0 => AtoProposalTrade::Pending,
+			1 => AtoProposalTrade::ToDo,
+			2 => AtoProposalTrade::Done,
+			_ => panic!("Invalid AtoProposalTrade value"),
+		}
+	}
+}

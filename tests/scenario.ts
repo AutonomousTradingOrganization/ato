@@ -11,9 +11,13 @@ const ATO_PROPS_STATUS_PAUSED   = 3;
 const ATO_PROPS_STATUS_CANCELED = 4;
 const ATO_PROPS_STATUS_ERROR    = 5;
 
-const ATO_PROPS_MODE_OVER  = 0;
-const ATO_PROPS_MODE_LOWER = 1;
+const ATO_PROPS_MODE_OVER   = 0;
+const ATO_PROPS_MODE_LOWER  = 1;
 const ATO_PROPS_MODE_TIMING = 2;
+
+const ATO_PROPS_TRADE_PENDING = 0;
+const ATO_PROPS_TRADE_TODO    = 1;
+const ATO_PROPS_TRADE_DONE    = 2;
 
 
 // this airdrops sol to an address
@@ -115,22 +119,23 @@ async function showAllVoters( program: anchor.Program<Ato>, accounts: any[], ato
 
 }
 
-async function showProposal( program, indexArray) {
+async function showProposal( program, indexProp) {
   const allProp = await program.account.atoProposal.all();
   console.log("----------------");
 
-  //console.log(allProp[indexArray]);
+  //console.log(allProp[indexProp]);
 
-  const index     = allProp[indexArray].account.index;
-  const title     = String.fromCharCode(...allProp[indexArray].account.title.filter(charCode => charCode !== 0));
-  const key       = allProp[indexArray].publicKey;
-  const amount    = allProp[indexArray].account.amount;
-  const threshold = allProp[indexArray].account.threshold;
-  const deadline  = allProp[indexArray].account.deadline;
-  const voteYes   = allProp[indexArray].account.voteYes;
-  const voteNo    = allProp[indexArray].account.voteNo;
-  const mode      = allProp[indexArray].account.mode;
-  const status    = allProp[indexArray].account.status;
+  const index     = allProp[indexProp].account.index;
+  const title     = String.fromCharCode(...allProp[indexProp].account.title.filter(charCode => charCode !== 0));
+  const key       = allProp[indexProp].publicKey;
+  const amount    = allProp[indexProp].account.amount;
+  const threshold = allProp[indexProp].account.threshold;
+  const deadline  = allProp[indexProp].account.deadline;
+  const voteYes   = allProp[indexProp].account.voteYes;
+  const voteNo    = allProp[indexProp].account.voteNo;
+  const mode      = allProp[indexProp].account.mode;
+  const status    = allProp[indexProp].account.status;
+  const trade     = allProp[indexProp].account.trade;
 
   console.log("proposal  # "+index);
   console.log("title     : "+title);
@@ -158,6 +163,13 @@ async function showProposal( program, indexArray) {
     "Timing",
   ];
   console.log("mode     : "+PropModeString[mode]);
+
+  const PropTradeString: string[] = [
+    "Pending",
+    "ToDo",
+    "Done",
+  ];
+  console.log("trade    : "+PropTradeString[trade]);
 
   console.log("----------------");
   console.log("");
@@ -187,24 +199,35 @@ async function showAllProposals( program, atoDataKeypair: anchor.web3.Keypair) {
 }
 
 
-async function checkProposal( program, indexArray, value, now) {
+async function verifyVote(program, indexProp, voteYes, voteNo) {
+  if(voteYes > voteNo) {
+    // TODO
+  } else {
+    // TODO
+  }
+}
+
+async function checkProposal( provider, program, indexProp, value, now) {
   const allProp = await program.account.atoProposal.all();
-  const status    = allProp[indexArray].account.status;
+  const status  = allProp[indexProp].account.status;
   if(status != ATO_PROPS_STATUS_OPENED) { return;}
+
+  const trade  = allProp[indexProp].account.trade;
+  if(trade != ATO_PROPS_TRADE_DONE) { return;}
 
   console.log("----------------");
 
-  //console.log(allProp[indexArray]);
+  //console.log(allProp[indexProp]);
 
-  const index     = allProp[indexArray].account.index;
-  const title     = String.fromCharCode(...allProp[indexArray].account.title.filter(charCode => charCode !== 0));
-  const key       = allProp[indexArray].publicKey;
-  const amount    = allProp[indexArray].account.amount;
-  const threshold = allProp[indexArray].account.threshold;
-  const deadline  = allProp[indexArray].account.deadline;
-  const voteYes   = allProp[indexArray].account.voteYes;
-  const voteNo    = allProp[indexArray].account.voteNo;
-  const mode      = allProp[indexArray].account.mode;
+  const index     = allProp[indexProp].account.index;
+  const title     = String.fromCharCode(...allProp[indexProp].account.title.filter(charCode => charCode !== 0));
+  const key       = allProp[indexProp].publicKey;
+  const amount    = allProp[indexProp].account.amount;
+  const threshold = allProp[indexProp].account.threshold;
+  const deadline  = allProp[indexProp].account.deadline;
+  const voteYes   = allProp[indexProp].account.voteYes;
+  const voteNo    = allProp[indexProp].account.voteNo;
+  const mode      = allProp[indexProp].account.mode;
 
   const PropStatusString: string[] = [
     "Waiting",
@@ -215,24 +238,47 @@ async function checkProposal( program, indexArray, value, now) {
     "Error",
   ];
 
-  switch( mode) {
-    case ATO_PROPS_MODE_OVER: {
-      if( value >= threshold) {
-        // TODO
-      }
-    }
+  // switch( mode) {
+  //   case ATO_PROPS_MODE_OVER: {
+  //     if( value >= threshold) {
+  //       await verifyVote( program, indexProp, voteYes, voteNo);
+  //     }
+  //   }
 
-    case ATO_PROPS_MODE_LOWER: {
-      if( value <= threshold) {
-        // TODO
-      }
-    }
+  //   case ATO_PROPS_MODE_LOWER: {
+  //     if( value <= threshold) {
+  //       await verifyVote( program, indexProp, voteYes, voteNo);
+  //     }
+  //   }
 
-    case ATO_PROPS_MODE_TIMING: {
-       // TODO
-    }
+  //   case ATO_PROPS_MODE_TIMING: {
+  //     if( now >= deadline) {
+  //       verifyVote( program, indexProp, voteYes, voteNo);
+  //     }
+  //   }
 
-  }
+  // }
+
+  let txStatus  : string;
+  let propPubkey: anchor.web3.PublicKey;
+  //let propsIndex: number;
+
+  propPubkey = await getPubkeyFromProposal( provider, program, index);
+
+  txStatus = await program.methods
+  .proposalCheck(
+    status,
+  ).accounts({
+    propData     : propPubkey,
+    //atoData      : atoDataKeypair.publicKey,
+    signer       : provider.wallet.publicKey,
+    systemProgram: anchor.web3.SystemProgram.programId,
+  })
+  //.signers([provider.wallet])
+  .rpc();
+
+console.log("(prop status...) https://solana.fm/tx/"+txStatus);
+console.log("");
 
   console.log("----------------");
   console.log("");
@@ -240,13 +286,18 @@ async function checkProposal( program, indexArray, value, now) {
 }
 
 /*
+
+scheduler only ?!
+
 changer :
 - status proposal -> AtoProposalStatus::Closed
 - trade flag proposal -> true
 
+test balance des vote TS ou RS ??
+
 */
 
-async function check( program, atoDataKeypair: anchor.web3.Keypair, value, now) {
+async function check( provider, program, atoDataKeypair: anchor.web3.Keypair, value, now) {
 
   console.log("================");
 
@@ -262,7 +313,7 @@ async function check( program, atoDataKeypair: anchor.web3.Keypair, value, now) 
   //console.log("proposal(s) : "+ (proposalIndexTail-proposalIndexHead) +" [" + proposalIndexHead+" - " + (proposalIndexTail-1)+"]");
 
   for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
-    await checkProposal(program, i, value, now);
+    await checkProposal(provider, program, i, value, now);
   }
 
   console.log("");

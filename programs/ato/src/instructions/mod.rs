@@ -18,3 +18,6 @@ pub mod vote;
 
 pub mod proposal_set_status;
 //pub use proposal_set_status::*;
+
+pub mod proposal_check;
+//pub use proposal_check::*;

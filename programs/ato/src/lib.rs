@@ -54,9 +54,7 @@ pub mod ato {
 	) -> Result<()> {
 		voter_registration::call(ctx, name, email)
 	}
-
-
-
+	
 	pub fn vote(
 		ctx   : Context<Vote>,
 		vote  : bool,
@@ -66,6 +64,14 @@ pub mod ato {
 		vote::call(ctx, vote, amount, now)
 	}
 
+
+	pub fn proposal_check(
+		ctx  : Context<ProposalCheck>,
+		value: u64,
+		now  : u64
+	) -> Result<()> {
+		proposal_check::call(ctx, value, now)
+	}
 
 }
 
