@@ -1201,10 +1201,133 @@ describe("ato", () => {
 
       await showAllVoters( program, accounts, atoDataKeypair);
 
-      let allVote = await program.account.atoVote.all();
-      console.log("vote "); console.log(allVote);
-      console.log("");
+      await showAllVotes(program, accounts, atoDataKeypair);
+      // let allVote = await program.account.atoVote.all();
+      // console.log("vote "); console.log(allVote);
+      // console.log("");
 
     });
 
   });
+
+///
+
+  async function getPropByIndex( program, index) {
+    const allProp = await program.account.atoProposal.all();
+    let nn = allProp.length;
+    //console.log(nn);
+    for(let i=0; i<nn; i++) {
+      const prop = allProp[i];
+      //console.log(prop);
+      if(prop.account.index == index) {
+        return prop;
+      }  
+    }
+  }
+  
+  async function getVoterByIndex( program, index) {
+    const allVoter = await program.account.atoVoter.all();
+    let nn = allVoter.length;
+    //console.log("nn", nn);
+    for(let i=0; i<nn; i++) {
+      const voter = allVoter[i];
+      //console.log(voter);
+      if(voter.account.index == index) {
+        return voter;
+      }
+    }
+  }
+  
+  async function showVote( program, accounts, indexProp) {
+    const allProp = await program.account.atoProposal.all();
+    let prop;
+    let voter;
+    let vote;
+  
+    prop = await getPropByIndex(program, indexProp);//  console.log(prop);
+    //console.log(indexProp," - ", prop.account.index);
+    // prop = await getPropByIndex(program, 0);  console.log(prop);
+    // prop = await getPropByIndex(program, 1);  console.log(prop);
+    // prop = await getPropByIndex(program, 2);  console.log(prop);
+  
+    ///if(allProp[indexProp].account.voteIndexTail <= 0) {return;}
+    const voteIndexTail = prop.account.voteIndexTail;
+    if(voteIndexTail <= 0) {return;}
+  
+    for(let indexVote = 0; indexVote < voteIndexTail; indexVote++) {
+      //voterU8Name = voter.account.name;
+      const voter      = await getVoterByIndex( program, indexVote);
+      const voterName  = String.fromCharCode(...voter.account.name.filter(charCode => charCode !== 0));
+      const voterIndex = voter.account.index;
+  
+      console.log("----------------");
+  
+      //console.log("amount ", voterIndex);
+      const propTitle  = String.fromCharCode(...prop.account.title.filter(charCode => charCode !== 0));
+      console.log(voterName+ " --> "+ propTitle);
+      console.log("vote      # "+indexVote);
+      console.log("YES       : "+prop.account.voteYes);
+      console.log("NO        : "+prop.account.voteNo);
+  
+      console.log("----------------");
+      console.log("");
+    }
+  
+  
+    // const proposalIndex = prop.account.proposalIndex;
+    // const voterIndex    = prop.account.voterIndex;
+    // const voteIndex     = prop.account.index;
+    // // const proposalIndex = allProp[indexProp].account.proposalIndex;
+    // // const voterIndex    = allProp[indexProp].account.voterIndex;
+    // // const voteIndex     = allProp[indexProp].account.index;
+  
+    // const allVoter = await program.account.atoVoter.all();
+  
+    // console.log("vote     # "+voteIndex);
+  
+    // let voterName;
+    // console.log("voterIndex", voterIndex);
+    // voter = await getVoterByIndex(program, voterIndex);
+    // console.log(voter);
+    // console.log(voterIndex," - ", voter.account.index);
+    // voterName = voter.account.name;
+    // const propName  = String.fromCharCode(...prop.account.title.filter(charCode => charCode !== 0));
+    // ///const propName  = String.fromCharCode(...allProp[indexProp].account.title.filter(charCode => charCode !== 0));
+    // console.log(voterName+ " --> "+ propName);
+  
+    
+  }
+  
+  
+  async function showAllVotes( program, accounts, atoDataKeypair: anchor.web3.Keypair) {
+  
+    console.log("================");
+  
+    const proposalIndexHead = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexHead.valueOf();
+    //-console.log("prop  idx head : " + proposalIndexHead);
+    
+    const proposalIndexTail = (
+      await program.account.atoData.fetch(atoDataKeypair.publicKey)
+    ).proposalIndexTail.valueOf();
+    //-console.log("prop  idx tail : " + proposalIndexTail);
+    //console.log("proposals : "+ (proposalIndexTail-proposalIndexHead) +" [" + proposalIndexHead+" - " + (proposalIndexTail-1)+"]");
+  
+    const allProp = await program.account.atoProposal.all();
+  
+    let totalNnVote: number = 0;
+  
+    for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
+      totalNnVote += allProp[i].account.voteIndexTail;
+    }
+    console.log(totalNnVote+" vote(s)");
+  
+    for(let i=proposalIndexHead; i<proposalIndexTail; i++) {
+      await showVote(program, accounts, i);
+    }
+    
+    console.log("");
+  }
+  
+  
