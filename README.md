@@ -232,3 +232,11 @@ platform-tools v1.41
 rustc 1.75.0
 ```
 
+## Resources
+
+- **GitHub**:
+  - [AutonomousTradingOrganization · GitHub](https://github.com/AutonomousTradingOrganization)
+  - [Laugharne (Laugharne) · GitHub](https://github.com/Laugharne)
+  - [Boyquotes · GitHub](https://github.com/Boyquotes)
+- **Documentation**: [GitHub - AutonomousTradingOrganization/Documentation](https://github.com/AutonomousTradingOrganization/documentation)
+- **Miro**: [Miro | The Visual Workspace for Innovation](https://miro.com/app/board/uXjVK0d8Its=/)
