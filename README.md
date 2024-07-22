@@ -12,8 +12,8 @@
 https://autonomoustradingorganization.github.io/frontend-react-build/
 
 ## TEAM
-  - [Laugharne (Laugharne) · GitHub](https://github.com/Laugharne)
-  - [Boyquotes · GitHub](https://github.com/Boyquotes)
+  - Franck Maussand - [Laugharne (Laugharne) · GitHub](https://github.com/Laugharne)
+  - Nicolas Villa - [Boyquotes · GitHub](https://github.com/Boyquotes)
 
 ### Components
 
