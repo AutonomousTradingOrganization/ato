@@ -8,7 +8,6 @@ use crate::constants;
 pub use constants::*;
 
 #[account]
-//#[derive(InitSpace)]
 pub struct AtoData {
 	pub admin              : Pubkey,
 	pub scheduler          : Pubkey,
@@ -47,7 +46,6 @@ pub struct SetScheduler<'info> {
 
 	#[account(
 		mut,
-		//constraint = signer.key() == ato_data.admin	//ADMIN ONLY
 	)]
 	pub signer: Signer<'info>,
 
@@ -142,7 +140,6 @@ pub struct AtoVote {
 
 
 #[derive(Accounts)]
-//#[instruction(index_voter: u16, index_prop: u16)]
 pub struct Vote<'info> {
 
 	#[account(
@@ -177,7 +174,6 @@ pub struct Vote<'info> {
 
 
 #[derive(Accounts)]
-//#[instruction(amount: u64)]
 pub struct ProposalSetStatus<'info> {
 
 	#[account(
@@ -247,11 +243,6 @@ pub struct ProposalCheck<'info> {
 	)]
 	pub prop_data: Account<'info, AtoProposal>,
 	
-	// #[account(
-	// 	mut,
-	// )]
-	// pub ato_data: Account<'info, AtoData>,
-
 	#[account(
 		mut,
 	)]

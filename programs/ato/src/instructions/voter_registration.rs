@@ -25,9 +25,6 @@ pub fn call(
 
 	voter_data.voter = ctx.accounts.voter.key();
 	voter_data.index = ato_data.voter_index_tail;
-	// debug purpose
-	// msg!("voter {} / {}", name, voter_data.index);
-	// debug purpose
 	ato_data.voter_index_tail += 1;
 
 	Ok(())

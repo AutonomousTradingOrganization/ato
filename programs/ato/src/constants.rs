@@ -21,6 +21,7 @@ pub enum AtoStatus {
 	Paused,		// Admin says, we stop everything !
 }
 
+// Add `.into()` conversion to u8
 impl From<u8> for AtoStatus {
 	fn from(value: u8) -> Self {
 		match value {
@@ -43,6 +44,7 @@ pub enum AtoProposalStatus {
 	MAX,
 }
 
+// Add `.into()` conversion to u8
 impl From<u8> for AtoProposalStatus {
 	fn from(value: u8) -> Self {
 		match value {
@@ -65,6 +67,7 @@ pub enum AtoProposalMode {
 	MAX
 }
 
+// Add `.into()` conversion to u8
 impl From<u8> for AtoProposalMode {
 	fn from(value: u8) -> Self {
 		match value {
@@ -82,6 +85,7 @@ pub enum AtoProposalTrade {
 	Done,
 }
 
+// Add `.into()` conversion to u8
 impl From<u8> for AtoProposalTrade {
 	fn from(value: u8) -> Self {
 		match value {

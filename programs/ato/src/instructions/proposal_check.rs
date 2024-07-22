@@ -15,6 +15,5 @@ pub fn call(
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 	//mode = prop_data.mode;
 	// TODO
-	msg!("PROPOSAL CHECK");
 	Ok(())
 }

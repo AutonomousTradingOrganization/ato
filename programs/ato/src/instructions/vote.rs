@@ -17,19 +17,6 @@ pub fn call(
 	let vote_data: &mut Account<AtoVote>     = &mut ctx.accounts.vote_data;
 	let voter_data: &mut Account<AtoVoter>   = &mut ctx.accounts.voter_data;
 
-	// debug purpose
-	// {
-	// 	msg!("pausable      {:?}", ato_data.paused);
-	// 	msg!("ato status    {:?}", ato_data.status);
-	// 	msg!("head index    {:?}", ato_data.proposal_index_head);
-	// 	msg!("tail index    {:?}", ato_data.proposal_index_tail);
-	// 	msg!("props status  {:?}", prop_data.status);
-	// 	msg!("amount        {:?}", amount);
-	// 	msg!("now           {:?}", now);
-	// 	msg!("deadline      {:?}", prop_data.deadline);
-	// }
-	// debug purpose
-
 	require_eq!(ato_data.status, AtoStatus::Ready as u8, AtoError::IncorrectProposalStatus);
 	require_eq!(prop_data.status, AtoProposalStatus::Opened as u8, AtoError::IncorrectProposalStatus);
 
@@ -48,30 +35,16 @@ pub fn call(
 	vote_data.timestamp = now;
 	vote_data.vote      = vote;
 
-	// debug purpose
-	//vote_data.leet1          = 4916;
-	//vote_data.leet2          = 4919;
-	// debug purpose
 	vote_data.proposal_index   = prop_data.index;
 	vote_data.voter_index      = voter_data.index;
 	vote_data.vote_index       = prop_data.vote_index_tail;
 	check_index!(prop_data.vote_index_tail);
 	prop_data.vote_index_tail += 1;
 
-	// debug purpose
-	// msg!("{}", vote_data.proposal_index);
-	// msg!("{}", vote_data.voter_index);
-	// msg!("{}", vote_data.vote_index);
-	// debug purpose
-
 	match vote {
 		true  => { prop_data.vote_yes +=1;},
 		false => { prop_data.vote_no  +=1;}
 	}
-	// debug purpose
-	// msg!("{}", prop_data.vote_yes);
-	// msg!("{}", prop_data.vote_no);
-	// debug purpose
 
 	prop_data.amount += amount;
 

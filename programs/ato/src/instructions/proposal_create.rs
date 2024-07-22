@@ -14,23 +14,6 @@ pub fn call(
 	deadline   : u64,
 ) -> Result<()> {
 
-	// {
-	// 	msg!("{}", line!());
-	// 	msg!("{}", title);
-	// 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-	// 	msg!("{:?}", prop_data.key());
-	// }
-
-	// debug purpose
-	// {
-	// 	// let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
-	// 	msg!("{:?}", title);
-	// 	msg!("{:?}", mode);
-	// 	msg!("{:?}", title.len());
-	// 	msg!("{:?}", deadline);
-	// }
-	// debug purpose
-
 	// sanity checks !
 	admin_only!(ctx);
 	require_gt!(AtoProposalMode::MAX as u8, mode,   AtoError::IncorrectProposalMode);
@@ -57,18 +40,8 @@ pub fn call(
 	prop_data.status = AtoProposalStatus::Waiting as u8;
 	prop_data.trade  = AtoProposalTrade::Pending as u8;
 
-	// debug purpose
-	// msg!("{:?}", prop_data.title);
-	// msg!("{:?}", prop_data.description);
-	// msg!("{:?}", prop_data.mode);
-	// msg!("{:?}", prop_data.deadline);
-	// debug purpose
-
 	// one more proposal pending...
 	prop_data.index = ato_data.proposal_index_tail;
-	// debug purpose
-	//msg!("proposal {} / {}", title, prop_data.index);	// debug purpose
-	// debug purpose
 	ato_data.proposal_index_tail += 1;
 	check_index!(ato_data.proposal_index_tail);
 

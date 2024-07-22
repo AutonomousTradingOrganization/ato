@@ -10,7 +10,6 @@ pub fn call(ctx: Context<ProposalSetStatus>, status: u8) -> Result<()> {
 
 	let prop_data: &mut Account<AtoProposal> = &mut ctx.accounts.prop_data;
 	require_gt!(AtoProposalStatus::MAX as u8, prop_data.status, AtoError::IncorrectProposalStatus);
-	//let ato_data: &mut Account<AtoData>       = &mut ctx.accounts.ato_data;
 	prop_data.status = status;
 
 	Ok(())
