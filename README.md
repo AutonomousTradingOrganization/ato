@@ -47,6 +47,8 @@ Front-End:
 
 3. Structures, associated to accounts
 
+Link to programs source : https://github.com/AutonomousTradingOrganization/ato/tree/main/programs/ato/src
+
     **Proposal**
     ```rust
     pub struct AtoProposal {
