@@ -72,7 +72,6 @@ pub struct SetPause<'info> {
 
 
 #[account]
-#[derive(InitSpace)]
 pub struct AtoProposal {
 	pub signer         : Pubkey,
 	pub deadline       : u64,
