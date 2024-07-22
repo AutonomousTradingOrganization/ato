@@ -15,6 +15,19 @@ https://autonomoustradingorganization.github.io/frontend-react-build/
   - Franck Maussand - [Laugharne (Laugharne) · GitHub](https://github.com/Laugharne)
   - Nicolas Villa - [Boyquotes · GitHub](https://github.com/Boyquotes)
 
+### Stack technique
+On-chain:
+- Solana
+- Rust
+- Anchor
+- TypeScript / chai / mocha (test units)    
+
+Front-End: 
+- React
+- Solana-web3 library / Anchor
+- TypeScript
+
+
 ### Components
 
 1. Program & instructions
