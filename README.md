@@ -24,46 +24,46 @@
     **Proposal**
     ```rust
     pub struct AtoProposal {
-    	pub signer         : Pubkey,
-    	pub deadline       : u64,
-    	pub threshold      : u64,
-    	pub amount         : u64,
-    	pub vote_yes       : u16,
-    	pub vote_no        : u16,
-    	pub vote_index_tail: u16,
-    	pub index          : u16,
-    	pub title          : [u8; STR_SIZE_TITLE],
-    	pub description    : [u8; STR_SIZE_DESCR],
-    	pub mode           : u8,
-    	pub status         : u8,
-    	pub trade          : u8,
+      pub signer         : Pubkey,
+      pub deadline       : u64,
+      pub threshold      : u64,
+      pub amount         : u64,
+      pub vote_yes       : u16,
+      pub vote_no        : u16,
+      pub vote_index_tail: u16,
+      pub index          : u16,
+      pub title          : [u8; STR_SIZE_TITLE],
+      pub description    : [u8; STR_SIZE_DESCR],
+      pub mode           : u8,
+      pub status         : u8,
+      pub trade          : u8,
     }
     ```
 
     **Voter**
     ```rust
     pub struct AtoVoter {
-    	pub voter: Pubkey,
-    	pub index: u16,
-    	pub name : [u8; STR_SIZE_NAME],
-    	pub email: [u8; STR_SIZE_EMAIL],
+      pub voter: Pubkey,
+      pub index: u16,
+      pub name : [u8; STR_SIZE_NAME],
+      pub email: [u8; STR_SIZE_EMAIL],
     }
     ```
 
     **Vote**
     ```rust
     pub struct AtoVote {
-    	pub voter         : Pubkey,
-    	pub amount        : u64,
-    	pub timestamp     : u64,
-    	
-    	pub proposal_index: u16,
-    	pub voter_index:    u16,
-    	pub vote_index:     u16,
+      pub voter         : Pubkey,
+      pub amount        : u64,
+      pub timestamp     : u64,
+      
+      pub proposal_index: u16,
+      pub voter_index:    u16,
+      pub vote_index:     u16,
     
-    	pub vote          : bool,
-    	// false = no
-    	// true  = yes
+      pub vote          : bool,
+      // false = no
+      // true  = yes
     
     }
     ```
@@ -73,14 +73,14 @@
     **compute_fn!**
     ```rust
     macro_rules! compute_fn {
-    	($msg:expr=> $($tt:tt)*) => {
-    		anchor_lang::solana_program::msg!(concat!($msg, " {"));
-    		anchor_lang::solana_program::log::sol_log_compute_units();
-    		let res = { $($tt)* };
-    		anchor_lang::solana_program::log::sol_log_compute_units();
-    		anchor_lang::solana_program::msg!(concat!(" } // ", $msg));
-    		res
-    	};
+      ($msg:expr=> $($tt:tt)*) => {
+        anchor_lang::solana_program::msg!(concat!($msg, " {"));
+        anchor_lang::solana_program::log::sol_log_compute_units();
+        let res = { $($tt)* };
+        anchor_lang::solana_program::log::sol_log_compute_units();
+        anchor_lang::solana_program::msg!(concat!(" } // ", $msg));
+        res
+      };
     }
     ```
     It allows you to measure and log the compute units consumed before and after the execution of a block of code.
@@ -88,11 +88,11 @@
     **admin_only!**
     ```rust
     macro_rules! admin_only {
-    	($ctx:expr) => {{
-    		let ato_data = &mut $ctx.accounts.ato_data;
-    		let signer = &$ctx.accounts.signer;
-    		require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
-    	}};
+      ($ctx:expr) => {{
+        let ato_data = &mut $ctx.accounts.ato_data;
+        let signer = &$ctx.accounts.signer;
+        require_eq!(ato_data.admin, signer.key(), AtoError::AdminOnly);
+      }};
     }
     ```
     It allow to check the rule for administrator role.
@@ -100,11 +100,11 @@
     **scheduler_only!**
     ```rust
     macro_rules! scheduler_only {
-    	($ctx:expr) => {{
-    		let ato_data = &mut $ctx.accounts.ato_data;
-    		let signer = &$ctx.accounts.signer;
-    		require_eq!(ato_data.scheduler, signer.key(), AtoError::SchedulerOnly);
-    	}};
+      ($ctx:expr) => {{
+        let ato_data = &mut $ctx.accounts.ato_data;
+        let signer = &$ctx.accounts.signer;
+        require_eq!(ato_data.scheduler, signer.key(), AtoError::SchedulerOnly);
+      }};
     }
     ```
     It allow to check the rule for scheduler role.
@@ -112,10 +112,10 @@
     **pausable!**
     ```rust
     macro_rules! pausable {
-    	($ctx:expr) => {{
-    		let ato_data = &mut $ctx.accounts.ato_data;
-    		require_eq!(ato_data.paused, false, AtoError::ProgramPaused);
-    	}};
+      ($ctx:expr) => {{
+        let ato_data = &mut $ctx.accounts.ato_data;
+        require_eq!(ato_data.paused, false, AtoError::ProgramPaused);
+      }};
     }
     ```
     It allow to check if program is on "pause" mode.
@@ -123,12 +123,12 @@
     **string_to_u8!**
     ```rust
     macro_rules! string_to_u8 {
-    	($string:expr, $storage_title:expr) => {{
-    		let bytes: &[u8] = $string.as_bytes();
-    		let len = bytes.len().min($storage_title.len());
-    		$storage_title[..len].copy_from_slice(&bytes[..len]);
-    		//$storage_title
-    	}};
+      ($string:expr, $storage_title:expr) => {{
+        let bytes: &[u8] = $string.as_bytes();
+        let len = bytes.len().min($storage_title.len());
+        $storage_title[..len].copy_from_slice(&bytes[..len]);
+        //$storage_title
+      }};
     }
     ```
     The macro is useful when you need to store string data in a fixed-size array or of `u8` values. This is often required in environments like **Solana smart contracts** where fixed-size buffers are used for efficiency and compatibility with on-chain data structures.
@@ -136,9 +136,9 @@
     **check_index!**
     ```rust
     macro_rules! check_index {
-    	($index:expr) => {{
-    		require_gt!(ATO_INDEX_MAX, $index, AtoError::OutOfBoundIndex);
-    	}};
+      ($index:expr) => {{
+        require_gt!(ATO_INDEX_MAX, $index, AtoError::OutOfBoundIndex);
+      }};
     }
     ```
     Essentially, this macro is a shorthand to check that a given index is within acceptable bounds, specifically less than **ATO_INDEX_MAX**, and to handle the error case cleanly if it is not.
