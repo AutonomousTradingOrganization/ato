@@ -11,6 +11,10 @@
 ## Demo
 https://autonomoustradingorganization.github.io/frontend-react-build/
 
+## TEAM
+  - [Laugharne (Laugharne) · GitHub](https://github.com/Laugharne)
+  - [Boyquotes · GitHub](https://github.com/Boyquotes)
+
 ### Components
 
 1. Program & instructions
