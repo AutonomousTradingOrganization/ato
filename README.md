@@ -22,7 +22,7 @@ On-chain:
 - Anchor
 - TypeScript / chai / mocha (test units)    
 
-Front-End: 
+Front-End: Link to front repository -> https://github.com/AutonomousTradingOrganization/frontend-react
 - React
 - Solana-web3 library / Anchor
 - TypeScript
