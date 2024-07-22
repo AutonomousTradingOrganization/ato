@@ -1,13 +1,80 @@
+# ATO : Autonomous Trading Organization
+
+## Overview
+
+### Components
+
+1. Program & instructions
+  - **DAO Initialization**: Initialize the DAO with the necessary configuration.
+  - **Setting scheduler key**: Set the scheduler public key (used for vote checking).
+  - **Pausable mode**: Pausable mode, to "freeze" the DAO.
+  - **Create Proposal**: Create a new proposal for voting.
+  - **Voter registration**: Register members as eligible voters.
+  - **Change proposal status**: Update the status of proposals.
+  - **Vote on Proposal**: Allow members to vote on the proposals.
+
+2. Accounts
+
+3. Structures
+
+4. Macros
+
+### Purpose
+The purpose of this project is to create a DAO on the Solana blockchain where members can propose and vote on different proposals. The voting can be triggered based on a time duration or a threshold value obtained from an oracle.
+
+### Testing the DAO
+The project includes tests using `web3.js` and `chai` to ensure the functionalities work as expected. Example test scenarios include initializing the DAO, adding voters, creating and voting on proposals (and checking the results).
+
+
+## Code structure
+
+```bash
+.
+├── app
+├── migrations
+│   └── deploy.ts
+├── programs
+│   └── ato
+│       ├── src
+│       │   ├── instructions
+│       │   │   ├── initialize.rs
+│       │   │   ├── mod.rs
+│       │   │   ├── proposal_check.rs
+│       │   │   ├── proposal_create.rs
+│       │   │   ├── proposal_set_status.rs
+│       │   │   ├── set_pause.rs
+│       │   │   ├── set_scheduler.rs
+│       │   │   ├── voter_registration.rs
+│       │   │   └── vote.rs
+│       │   ├── constants.rs
+│       │   ├── errors.rs
+│       │   ├── lib.rs
+│       │   ├── macros.rs
+│       │   └── states.rs
+│       ├── Cargo.toml
+│       └── Xargo.toml
+├── tests
+│   └── ato.ts
+├── Anchor.toml
+├── Cargo.lock
+├── Cargo.toml
+├── package.json
+├── README.md
+├── tests_local_deploy.png
+├── tsconfig.json
+└── yarn.lock
+
+7 directories, 26 files
+```
+
 
 ## Launch
-
-![](deploy_local_test.png)
 
 ### Local validator
 
 `solana-test-validator --reset`
 
-Beware it creates local files and directories at the current working directory.
+⚠️ Beware it creates local files and directories at the current working directory.
 
 
 ### Real-time logs display
@@ -15,11 +82,12 @@ Beware it creates local files and directories at the current working directory.
 `solana logs`
 
 
-### Deploy and launch tests
+### Local deploy and launch tests
 
 `anchor test --skip-local-validator`
 
-**TO DO**
+![](tests_local_deploy.png)
+
 
 ## Versions
 

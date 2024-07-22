@@ -1088,7 +1088,7 @@ describe("ato", () => {
 
       // console.log("proposal_set_status BEGIN");
       // await showAllProposals( program, atoDataKeypair);
-      await showAllProposals( program, atoDataKeypair);
+      //await showAllProposals( program, atoDataKeypair);
 
       // set status of prop2 to AtoProposalStatus::Canceled
       // check it
@@ -1184,8 +1184,8 @@ describe("ato", () => {
       .signers([walletAlain])
       .rpc();
 
-      console.log("https://solana.fm/tx/"+txVote);
-      console.log("");
+      // console.log("https://solana.fm/tx/"+txVote);
+      // console.log("");
 
     });
 
@@ -1195,16 +1195,16 @@ describe("ato", () => {
     it("Voting is closed !", async () => {
       // let allAto = await program.account.atoData.all();
       // console.log("root ");  console.log(allAto);
-      console.log("");
+      // console.log("");
 
       await showAllProposals( program, atoDataKeypair);
 
       await showAllVoters( program, accounts, atoDataKeypair);
 
       await showAllVotes(program, accounts, atoDataKeypair);
-      // let allVote = await program.account.atoVote.all();
-      // console.log("vote "); console.log(allVote);
-      // console.log("");
+      // // let allVote = await program.account.atoVote.all();
+      // // console.log("vote "); console.log(allVote);
+      // // console.log("");
 
     });
 
