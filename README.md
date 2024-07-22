@@ -2,6 +2,8 @@
 
 ## Overview
 
+![](ATOschémaSC(v1).png)
+
 ### Components
 
 1. Program & instructions
