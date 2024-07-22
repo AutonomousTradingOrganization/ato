@@ -1,3 +1,7 @@
+![](logoAto.png)
+
+--------
+
 # ATO : Autonomous Trading Organization
 
 ## Overview
